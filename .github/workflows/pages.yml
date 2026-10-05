@@ -1,0 +1,50 @@
+name: 部署到 GitHub Pages
+
+# 触发：推 main 跑一次；手动也能跑（Actions 页面上的 Run workflow）。
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# Pages 部署需要 write 权限，而默认的 read-all 不含。
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# 不打断别人正在跑的部署：同分支上后来的一次取消前一次。
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      # 仓库根目录就是编译产物本身，没有构建步骤——源码在
+      # 188js 仓库，产物由本地 `npm run build` 生成后提交到这里。
+      - uses: actions/checkout@v4
+
+      # 只把站点需要的文件交给 Pages。仓库里还有 .github / README，
+      # 它们不该出现在站点上。
+      - name: 收集站点文件
+        run: |
+          mkdir -p _site
+          cp -r assets audio fonts models index.html _site/
+          cp .nojekyll _site/.nojekyll
+
+      # enablement: 仓库还没开过 Pages 时由这一步替它开，省掉
+      # Settings → Pages 里的一次手动点击。
+      - uses: actions/configure-pages@v5
+        with:
+          enablement: true
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+      - id: deployment
+        uses: actions/deploy-pages@v4
