@@ -28,13 +28,19 @@ jobs:
       # 188js 仓库，产物由本地 `npm run build` 生成后提交到这里。
       - uses: actions/checkout@v4
 
-      # 只把站点需要的文件交给 Pages。仓库里还有 .github / README，
-      # 它们不该出现在站点上。
+      # 站点文件 = 仓库根目录里除版本库/工作流/文档之外的一切。
+      #
+      # 这里刻意**不写死文件清单**。写死的版本漏过一次：产物里多出
+      # `ui/titleart.jpg`（标题页主视觉），清单没跟着改，线上标题图
+      # 直接 404 —— 而工作流照样绿灯。排除列表只列仓库自身的东西，
+      # 新增的资源目录于是不需要改工作流就会自动上线。
       - name: 收集站点文件
         run: |
           mkdir -p _site
-          cp -r assets audio fonts models index.html _site/
-          cp .nojekyll _site/.nojekyll
+          tar --exclude='./.git' --exclude='./.github' \
+              --exclude='./.gitattributes' --exclude='./.gitignore' \
+              --exclude='./README.md' --exclude='./_site' \
+              -cf - . | tar -xf - -C _site
 
       # enablement: 仓库还没开过 Pages 时由这一步替它开，省掉
       # Settings → Pages 里的一次手动点击。
