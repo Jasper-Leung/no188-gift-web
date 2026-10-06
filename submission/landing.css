@@ -387,6 +387,20 @@ main {
   font-size: 0.9rem;
 }
 
+/* 镜像可用性之类的补充说明：没朱点，只压一个灰 */
+.notes-hint {
+  margin: 0 0 1rem;
+  font-size: 0.85rem;
+  color: var(--ink-dim);
+}
+.notes-hint code {
+  padding: 0.05em 0.3em;
+  font-family: ui-monospace, 'SFMono-Regular', Consolas, monospace;
+  font-size: 0.9em;
+  background: rgba(42, 38, 34, 0.06);
+  border-radius: 2px;
+}
+
 /* ---------------------------------------------------------------- 按钮 */
 .btn {
   display: inline-block;
@@ -475,6 +489,10 @@ code[data-todo]::after {
 
 .cta-big {
   margin: 0 0 1rem;
+}
+/* 两个镜像按钮并排：inline-block 之间的换行只折成一个空格，太挤 */
+.cta-big .btn + .btn {
+  margin-left: 0.75rem;
 }
 
 /* ---------------------------------------------------------------- 链接行 */
