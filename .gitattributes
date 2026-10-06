@@ -1,10 +1,6 @@
 # 资产是二进制，明确标出来。
-# 自动探测在压缩文件上有误判的可能，而一次误判的后果是整个
-# GLB 被当成文本重新编码——仓库当场膨胀数倍。
-*.glb   binary
-*.ogg   binary
-*.wav   binary
-*.mp3   binary
+# 自动探测在压缩文件上有误判的可能，而一次误判的后果就是整个
+# 文件被当成文本重新编码——仓库当场膨胀数倍。
 *.woff2 binary
 *.woff  binary
 *.jpg   binary
@@ -16,7 +12,7 @@
 # 而 CRLF 只会在 diff 里制造噪声。
 * text=auto eol=lf
 
-# 官网那一页的演示录屏（submission/media/demo.mp4，23MB）。
+# 官网介绍页的演示录屏（media/demo.mp4，23MB）。
 # 为什么这一条要放在通配符**下面**：上面那个 `binary` 块里的 `-text` 会被
 # 后面的 `* text=auto` 盖掉（同一属性以后出现的规则为准），所以对 mp4 来说
 # 真正生效的只有 `-diff`。23MB 的片子一旦被误判成文本、重新编码，
