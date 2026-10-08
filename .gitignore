@@ -3,3 +3,6 @@ _site/
 
 # 本地一次性脚本与探针的暂存（同步页面用的 copy-submission.mjs 之类）
 .cache/
+
+# 只有切字体（npm run font）才用得上，产物 fonts/ui.woff2 已入库
+node_modules/

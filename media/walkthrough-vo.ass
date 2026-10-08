@@ -1,0 +1,46 @@
+[Script Info]
+; 烧录字幕用。由 media/walkthrough-vo.en.srt 转来，勿手改。
+;
+; 为什么不让 libass 直接读 SRT：
+; `subtitles` 滤镜给 SRT 生成的 ASS 头里 PlayResX/Y 写死 384x288
+; （f_subtitles.c 里 orig_w/orig_h <= 0 的分支），而 original_size=1920x1080
+; 在 ffmpeg 4.2.3 这版上没有生效。后果是所有样式数值都在 288 高的空间里算完
+; 再放大到 1080：FontSize=30 实际约 110px，字幕跑到画面正中央，而且**不报错**。
+; 自己生成 ASS 把 PlayRes 钉成 1920x1080，样式数值才是最终像素。
+;
+; MarginV=190 的来历：新片里道具栏在 y≈1001–1062，游戏自己的字幕常驻 y≈912–987，
+; 对话卡止于 y≈630。190 让字幕落在 y≈850–890，三样都不碰。
+ScriptType: v4.00+
+PlayResX: 1920
+PlayResY: 1080
+WrapStyle: 2
+ScaledBorderAndShadow: yes
+YCbCr Matrix: TV.709
+
+[V4+ Styles]
+Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
+Style: VO,Microsoft YaHei,30,&H00FFFFFF,&H000000FF,&HD0000000,&H64000000,0,0,0,0,100,100,0.4,0,1,2.2,0,2,110,110,190,1
+
+[Events]
+Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
+
+Dialogue: 0,0:00:01.00,0:00:05.40,VO,,0,0,0,,One full lap of Gift No.188.
+Dialogue: 0,0:00:05.80,0:00:09.44,VO,,0,0,0,,One road, start to start, a figure eight.
+Dialogue: 0,0:00:09.84,0:00:15.82,VO,,0,0,0,,Two clicks in: coins, heart, stations, fragments.
+Dialogue: 0,0:00:16.22,0:00:19.31,VO,,0,0,0,,Then the camera settles behind his shoulders.
+Dialogue: 0,0:00:19.71,0:00:25.55,VO,,0,0,0,,Here, the road doubles back. Nothing marks it but the road itself.
+Dialogue: 0,0:00:25.95,0:00:28.04,VO,,0,0,0,,He keeps the way home for everyone.
+Dialogue: 0,0:00:28.44,0:00:30.86,VO,,0,0,0,,The price is that no one remembers him.
+Dialogue: 0,0:00:31.26,0:00:35.08,VO,,0,0,0,,Space, and the station asks you to remember a bird.
+Dialogue: 0,0:00:39.80,0:00:42.49,VO,,0,0,0,,You take a shard for it. One of five.
+Dialogue: 0,0:00:43.80,0:00:46.72,VO,,0,0,0,,Two more visits there before it gives anything up.
+Dialogue: 0,0:00:48.00,0:00:53.58,VO,,0,0,0,,And you are allowed to be late. That is the rule of the place.
+Dialogue: 0,0:00:53.98,0:00:59.17,VO,,0,0,0,,Nothing here can kill you. Composure only falls and never locks:
+Dialogue: 0,0:00:59.57,0:01:04.16,VO,,0,0,0,,no enemy, no fail state, no timer you can lose.
+Dialogue: 0,0:01:05.50,0:01:10.32,VO,,0,0,0,,The road keeps changing its mind. Pines, then bamboo,
+Dialogue: 0,0:01:11.50,0:01:17.01,VO,,0,0,0,,then open ground, a pavilion on the rise, and towers far off.
+Dialogue: 0,0:01:18.00,0:01:23.94,VO,,0,0,0,,Paper, ink, a seal and an envelope wait at the bottom of the screen.
+Dialogue: 0,0:01:24.34,0:01:27.64,VO,,0,0,0,,All of it gets pressed into one postcard at the end.
+Dialogue: 0,0:01:29.50,0:01:32.39,VO,,0,0,0,,Every building on this route is built in code,
+Dialogue: 0,0:01:34.00,0:01:38.25,VO,,0,0,0,,and the road itself downloads no texture files at all.
+Dialogue: 0,0:01:40.50,0:01:45.45,VO,,0,0,0,,The lap comes back to where it started. One shard, four more waiting.

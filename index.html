@@ -19,10 +19,17 @@
     <meta property="og:image" content="media/poster.jpg" />
 
     <!--
-      字体是游戏那份子集化的 ui.woff2（181KB，只含页面上真出现过的字符）。
-      游戏本体已经搬到 /188js/，但字体还是同一份，所以留在根目录：排印和游戏里
-      完全一致，代价只有 181KB。
-      这一条 404 的话 CSS 里写了回退字体栈，症状只是字形变了，不会白屏。
+      字体是 LXGW WenKai 按 **GB2312 全集**切的子集（7722 字 / 1.55 MB，见 tools/subset-font.mjs）。
+
+      为什么切这一套、而不是只切页面上出现过的字：后者会让**每改一句文案就得重切一次
+      字体**。GB2312 覆盖日常中文的 99.9% 以上，于是改文案永远碰不到字体。
+
+      它曾经直接用游戏仓库那份子集（切的是游戏 UI 的 880 字），而官网的中文跟游戏里的
+      不是同一批字——实测官网用到的 601 个可见字符里有 155 个不在那份里（153 个汉字，
+      外加 `–` 和 `↔`），掉到下面的回退栈就成了豆腐块。「同一款字体」不等于「同一个子集」。
+
+      preload 只为让 `font-display: swap` 的替换来得早一点；真到不了就晚点换，
+      文字不会空着（1.55MB 是子集化的结果，不是完整字库）。
     -->
     <link rel="preload" href="fonts/ui.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="preload" href="media/hero.jpg" as="image" />
@@ -66,11 +73,22 @@
           <li><b>20–30</b><span class="zh">分钟一程</span><span class="en">minutes a run</span></li>
         </ul>
 
+        <!--
+          试玩地址末尾那个孤零零的 `?` 是**缓存开关**，不是手滑。
+
+          Pages 走 CDN，游戏每次重新部署，浏览器和中间缓存却还攥着旧的
+          `index.html` 与旧的哈希资源——于是评测点进来看到的是上一版，
+          报的问题也是上一版的。给 URL 挂一个空查询串，它就成了另一个
+          缓存键，命中不了旧副本，每次点进来拿到的都是当下这版。
+
+          代价是零：Vite 不读查询串，`?` 照样路由到同一个 `index.html`。
+          备用镜像（workers.dev）不加——它没有这层 CDN 缓存问题。
+        -->
         <p class="hero-cta">
           <a
             class="btn btn-primary"
             data-cfg="demoUrl"
-            href="https://jasper-leung.github.io/188js/"
+            href="https://jasper-leung.github.io/188js/?"
             target="_blank"
             rel="noopener"
           >
@@ -151,30 +169,30 @@
           <p class="media-note">
             <span class="zh"
               >这次构建没有把录屏文件带上（多半是跑了 <code>--no-media</code>）。母版在仓库的
-              <code>promo/footage/07-walkthrough-vo.mp4</code>。</span
+              <code>promo/footage/07-walkthrough-vo-web.mp4</code>。</span
             ><span class="en"
               >This build shipped without the recording bundled. The master is at
-              <code>promo/footage/07-walkthrough-vo.mp4</code>.</span
+              <code>promo/footage/07-walkthrough-vo-web.mp4</code>.</span
             >
           </p>
 
           <p class="card-meta">
             <span class="zh"
-              >实录 1920×1080 · 网页版 1280×720 / 30fps · <span  data-cfg="videoDuration">3:52</span> ·
-              <span  data-cfg="videoSize">23.27 MB</span> · 直链播放，无需登录</span
+              >实录 1920×1080 · 网页版 1280×720 / 30fps · <span  data-cfg="videoDuration">1:49</span> ·
+              <span  data-cfg="videoSize">21.76 MB</span> · 直链播放，无需登录</span
             ><span class="en"
-              >Recorded 1920×1080 · web 1280×720 / 30fps · <span  data-cfg="videoDuration">3:52</span> ·
-              <span  data-cfg="videoSize">23.27 MB</span> · direct link, no login</span
+              >Recorded 1920×1080 · web 1280×720 / 30fps · <span  data-cfg="videoDuration">1:49</span> ·
+              <span  data-cfg="videoSize">21.76 MB</span> · direct link, no login</span
             >
           </p>
 
           <ul class="notes">
             <li>
               <span class="zh"
-                >3 分 52 秒一镜到底：标题页 → 引导页 → 进世界 → 序章 → 第一视角上路 → 骑完整整一圈
-                1228.8 m → 碎片站打卡 → 小游戏 → 退出面板 → 回到起点。</span
+                >1 分 49 秒一镜到底：标题页 → 引导页 → 进世界 → 序章 → 上路 → 骑完整整一圈
+                1228.8 m → 花房·禽语湖湾打卡 → 小游戏 → 退出面板 → 回到起点。</span
               ><span class="en"
-                >3:52, one continuous session: title → tutorial → world → prologue → first person →
+                >1:49, one continuous session: title → tutorial → world → prologue → on the road →
                 the full 1228.8 m lap → a fragment station → a minigame → back to the start.</span
               >
             </li>
@@ -187,15 +205,19 @@
               >
             </li>
             <li>
-              <span class="zh">带英配解说（42 句旁白）；关掉声音，画面本身也完全成立。</span>
-              <span class="en">English narration (42 cues). Mute it and the footage still stands up on its own.</span>
+              <span class="zh"
+                >英配解说（20 句旁白），<b>字幕已烧进画面</b>——静音也看得懂，不开声音不损失任何一句。</span
+              ><span class="en"
+                >English narration (20 cues) with the subtitles <b>burned into the picture</b> — watch it on mute and
+                you lose no line.</span
+              >
             </li>
             <li>
               <span class="zh"
-                >它全程徒步、只打了 1/5 块碎片——这是一次真实的通关尝试，不是宣传片。</span
+                >它骑的是自行车、只打了 1/5 块碎片——这是一次真实的通关尝试，不是宣传片。</span
               ><span class="en"
-                >On foot the whole way, one fragment of five collected — a real playthrough attempt,
-                not a promo cut.</span
+                >It rides the bicycle the whole way and collects one fragment of five — a real playthrough
+                attempt, not a promo cut.</span
               >
             </li>
           </ul>
@@ -232,7 +254,7 @@
             <a
               class="btn btn-primary btn-big"
               data-cfg="demoUrl"
-              href="https://jasper-leung.github.io/188js/"
+              href="https://jasper-leung.github.io/188js/?"
               target="_blank"
               rel="noopener"
             >
@@ -250,7 +272,7 @@
           </p>
 
           <p class="url-row">
-            <code id="demo-url-gh" data-cfg="demoUrl">https://jasper-leung.github.io/188js/</code>
+            <code id="demo-url-gh" data-cfg="demoUrl">https://jasper-leung.github.io/188js/?</code>
             <button class="copy" type="button" data-copy="#demo-url-gh">
               <span class="zh">复制</span><span class="en">Copy</span>
             </button>
@@ -284,9 +306,54 @@
                 world with nothing to download.</span
               >
             </li>
+            <!--
+              这一条不是免责声明，是实机行为。摩托车 4.82 MB，被故意挂在启动链**外面**单跑
+              （world.ts: `loadMotorcycleModel` 不并进 `loadVehicleExtras`），
+              而 `Vehicle.canEnter()` 在模型到位前恒为假——所以 E 只会跳过还没到的车，
+              不会把你切进一辆看不见的车。
+
+              **自动上车那一半不是「可以」，是「已经」**（main.ts 的 P1-6 落点）：
+              自行车模型到位时，如果 `vehicleTouched` 还是假（玩家没按过 E），游戏会
+              直接 `vehicle.set('bike')`。所以默认的起手状态就是骑车——录屏里那条
+              自行车（顶速 15 m/s，而徒步上限 6 m/s）就是这么来的。
+              写这段时如果只讲「按 E 切换」，就漏掉了不按键的人默认看到什么。
+            -->
+            <li>
+              <span class="zh"
+                ><b>开局直接给你一辆自行车。</b>三种车分批现下：2.79 MB 的自行车跟着启动链走，
+                4.82 MB 的摩托车则被单独挂在链外单跑，免得它拖住整批。所以<b>自行车模型一落地，
+                只要你自己没按过 <code>E</code>，游戏就先把人放上车</b>——这是「开局不要走路」那条
+                决定的落点。等进度条把剩下的模型跑完，<code>E</code> 才会把摩托车和滑板一起串进来。
+                模型没到位的车会被直接跳过，不会切到一个看不见的车。</span
+              ><span class="en"
+                ><b>You start on the bicycle.</b> The three rides load in separate batches: the 2.79 MB bicycle rides the
+                boot chain, while the 4.82 MB motorcycle is deliberately kept outside it so it can't hold up the whole
+                batch. So the moment the bicycle model lands — <b>as long as you haven't touched <code>E</code> yet — the
+                game puts you on it</b> rather than opening a game about cycling with a walk. Once the progress bar has
+                pulled in the rest, <code>E</code> picks up the motorcycle and skateboard too. Rides whose models haven't
+                landed are skipped outright rather than switched into empty air.</span
+              >
+            </li>
             <li><span class="zh">首屏 3.45 MB，之后按需加载；弱机走最低档也能跑。</span><span class="en">3.45 MB to first playable frame, then on demand — the low tier holds up on weak hardware.</span></li>
+            <!--
+              标题页那两颗按钮不是摆设：第二颗是「演示 · 90 秒」，替评审自己骑一遍，
+              不用碰键盘。这是给「只想看三十秒、不打算玩」的人准备的口子，
+              所以把它写进正文，而不是留在录屏里一带而过。
+            -->
+            <li>
+              <span class="zh"
+                ><b>不想动手也有得看。</b>标题页第二颗按钮是「演示 · 90 秒」——车自己往前骑，你的手不用碰键盘。
+                九十秒预算到点会自己收场进结算页（所以它真的会结束）；第 62 秒之后不再玩小游戏，
+                到站直接记一次拜访，不判你输。想自己开，就点左边那颗「开启旅程」。</span
+              ><span class="en"
+                ><b>You don't have to drive to see it.</b> The second button on the title screen is
+                <b>Demo · 90s</b>: the bike rides itself, no keys required. The 90-second budget really does end —
+                it closes out on the settlement screen — and past 62 s the minigames are stepped aside rather than
+                failed. To take over yourself, press <b>Start Journey</b>.</span
+              >
+            </li>
             <li><span class="zh">键盘 W/A/S/D + 方向键，触屏有虚拟摇杆；空格是对话键。</span><span class="en">Keyboard W/A/S/D and arrows, touch stick on mobile; space advances dialogue.</span></li>
-            <li><span class="zh">中英双语完整（各 401 条文案，键集合由回归钉住）。</span><span class="en">Fully bilingual — 401 strings per language, key parity held by the regression.</span></li>
+            <li><span class="zh">中英双语完整（各 415 条文案，键集合由回归钉住）。</span><span class="en">Fully bilingual — 415 strings per language, key parity held by the regression.</span></li>
             <li><span class="zh">需要 WebGL 2；浏览器若拦截自动播放，点一下画面即可。</span><span class="en">Needs WebGL 2; if the browser blocks autoplay, click once.</span></li>
           </ul>
 
@@ -442,11 +509,13 @@
               </li>
               <li>
                 <span class="zh"
-                  >13 个驿站模型里，7 座是代码生成的（屋檐、柱、基座、栏杆，每座 0.01 MB，零图片字节）；
-                  另外 5 座碎片驿站由 Tripo 生成，自带贴图。</span
+                  >16 座驿站落在 13 个模型位上：其中 7 个是代码生成的（屋檐、柱、基座、栏杆，每座
+                  0.01 MB，零图片字节），6 个加载真模型——5 座碎片驿站由 Tripo 生成、自带贴图，
+                  第 6 个位置本身就是一棵榕树。</span
                 ><span class="en"
-                  >Of 13 station models, 7 are generated in code at 0.01 MB each with zero image bytes; the 5 fragment
-                  stations come from Tripo and do carry their own textures.</span
+                  >The 16 stations stand on 13 model slots: 7 are generated in code at 0.01 MB each with zero image
+                  bytes, and 6 load real models — the 5 fragment stations come from Tripo and do carry their own
+                  textures, and the sixth slot is a banyan tree in its own right.</span
                 >
               </li>
               <li>
@@ -502,18 +571,19 @@
               <li>
                 <span class="zh"
                   >移植自 Godot 4.6 原型，本届比赛期间重做为 three.js r169 + TypeScript + Vite；
-                  玩法、数值与 401 条双语文案 1:1 保留，表现层与工程结构重做。</span
+                  玩法与数值 1:1 保留，双语文案在此基础上补到 415 条，表现层与工程结构重做。</span
                 ><span class="en"
                   >The original was Godot 4.6. This build is three.js r169 + TypeScript + Vite — a full port rebuilt
-                  during the competition, with gameplay, numbers and all 401 bilingual strings kept 1:1.</span
+                  during the competition: gameplay and numbers kept 1:1, the bilingual strings carried over and grown
+                  to 415, the presentation layer and project structure rebuilt.</span
                 >
               </li>
               <li>
                 <span class="zh"
-                  >几何不变量写成无头回归：<b>52 组 / 796 条断言</b>，钉住 961 个中线点、1228.8 m、4 处交叉、
+                  >几何不变量写成无头回归：<b>60 条 / 935 条断言</b>，钉住 961 个中线点、1228.8 m、4 处交叉、
                   16 座驿站可达、经济系统总量、水位、双语键集合一致。它是上线的门。</span
                 ><span class="en"
-                  >Geometric invariants live in a headless regression — <b>52 suites / 796 assertions</b> pinning the 961
+                  >Geometric invariants live in a headless regression — <b>60 suites / 935 assertions</b> pinning the 961
                   centreline points, 1228.8 m, 4 crossings, 16 reachable stations, economy totals, water level and
                   bilingual key parity. It gates the deploy.</span
                 >
@@ -538,7 +608,7 @@
           <tbody>
             <tr>
               <th><span class="zh">游戏本体</span><span class="en">Game build</span></th>
-              <td><b>20.77 MB</b><span class="zh"> · 63 个文件</span><span class="en"> · 63 files</span></td>
+              <td><b>20.78 MB</b><span class="zh"> · 63 个文件</span><span class="en"> · 63 files</span></td>
             </tr>
             <tr>
               <th><span class="zh">其中模型</span><span class="en">of which models</span></th>
@@ -546,20 +616,19 @@
             </tr>
             <tr>
               <th><span class="zh">首屏必下</span><span class="en">First playable frame</span></th>
-              <td><b>3.45 MB</b><span class="zh"> · JS gzip 280 KB</span><span class="en"> · 280 KB gzipped JS</span></td>
+              <td><b>3.45 MB</b><span class="zh"> · JS gzip 285 KB</span><span class="en"> · 285 KB gzipped JS</span></td>
             </tr>
             <tr>
               <th><span class="zh">开发规模</span><span class="en">Development</span></th>
-              <td><span class="zh">三天 · 32 笔提交 · 一人</span><span class="en">Three days · 32 commits · one person</span></td>
+              <td><span class="zh">四天 · 49 笔提交 · 一人</span><span class="en">Four days · 49 commits · one person</span></td>
             </tr>
           </tbody>
         </table>
         <p class="card-meta">
           <span class="zh"
-            >数字量自本机 <code>dist/</code>，2026-10-06；每次 <code>npm run build</code> 会把当次实测值打印出来。</span
+            >数字量自本机 <code>dist/</code>，2026-10-07。</span
           ><span class="en"
-            >Measured from the local <code>dist/</code> on 2026-10-06; every <code>npm run build</code> prints the
-            current numbers.</span
+            >Measured from the local <code>dist/</code> on 2026-10-07.</span
           >
         </p>
       </section>
@@ -572,7 +641,7 @@
         <a data-cfg="commitsUrl" href="https://github.com/Jasper-Leung/188js/commits/main"><span class="zh">提交记录</span><span class="en">Commits</span></a>
         <a
           data-cfg="demoUrl"
-          href="https://jasper-leung.github.io/188js/"
+          href="https://jasper-leung.github.io/188js/?"
           target="_blank"
           rel="noopener"
           ><span class="zh">在线 Demo</span><span class="en">Live demo</span></a

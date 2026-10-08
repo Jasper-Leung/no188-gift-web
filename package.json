@@ -1,0 +1,15 @@
+{
+  "name": "no188-gift-web",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Gift No.188 官方网站 —— 静态页，push 即部署，没有构建步骤。",
+  "scripts": {
+    "font": "node tools/subset-font.mjs",
+    "font:check": "node tools/subset-font.mjs --check"
+  },
+  "devDependencies": {
+    "fontverter": "^2.0.0",
+    "subset-font": "^2.9.0"
+  }
+}
