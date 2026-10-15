@@ -11,6 +11,7 @@ index.html      介绍页（站点根路径）
 landing.css     介绍页样式
 landing.js      语言切换 + 复制按钮
 media/          hero.jpg / poster.jpg / demo.mp4（录屏）+ 英配字幕 .srt / .ass
+                promo-morning.mp4（宣传氛围片）+ 封面帧 / 三张静帧
 fonts/ui.woff2  子集化字体，介绍页在用
 tools/          subset-font.mjs（只在改文案后需要跑，见下）
 submission/     只有一个跳转页，把旧地址引回根路径
@@ -116,6 +117,34 @@ ffmpeg -ss 36 -t 2 -i media/demo.mp4 -af volumedetect -f null NUL
 232 秒缩到 109 秒，**解说比片子还长**，照搬旧时间轴必然整段错位。改稿时凡是对着画面写的话
 （骑什么车、走什么景、顶栏写着什么）都要重新核一遍——上一版写的「全程徒步」在新片里已经不成立了。
 
+## 宣传物料
+
+页面上 `#promo` 那一节的素材，全部由 TapNow 生成，**不是游戏画面**——页面标题、图注、
+正文各标了一次。这么写不是谦虚：01 号卡片特地强调录屏「真实按键 · 非生成画面」，
+生成的画面要是含糊地摆在旁边，读者会默认它也是实录，那句话就当场作废。
+
+```
+promo-morning.mp4          氛围片：5.0 秒 / 864×496 / 24fps / 无音轨（源文件就没有）
+promo-morning-poster.jpg   封面帧，从上面那支片子的 t=2.5s 抽的（864×496）
+promo-still-two-cups.jpg   成片静帧（1280×720，原样）
+promo-style-a.jpg          风格候选 A · 清晨（2560×1440 → 1280×720）
+promo-style-c.jpg          风格候选 C · 两杯茶（同上，页面上标了「未采用」）
+```
+
+几个刻意的选择：
+
+- **封面帧从片子里抽，不另找一张。** 命令是
+  `ffmpeg -ss 2.5 -i promo-morning.mp4 -frames:v 1 -q:v 3 promo-morning-poster.jpg`。
+  另找一张同场景的图，迟早会和片子的构图对不上。
+- **`.promo-frame` 必须 `object-fit: cover`。** 源片 864×496 是 1.742，比 16:9 的 1.778 略窄，
+  而 `.video-frame video` 只写了 `width/height: 100%`、没有 `object-fit`——照抄过来就是横向拉伸约 2%。
+  cover 改成裁掉上下各约 5px，所以页面上的渲染比例量出来是 1.781。
+- **图注在相框外面。** 相框带 `aspect-ratio: 16/9` + `overflow: hidden`；图注要是放进框里，
+  会被盒高连同 `overflow` 一起裁掉，页面上直接看不见（这个坑踩过一次）。
+- **自动播放是这一页唯一会自己动的东西**，所以 `landing.js` 里留了一小段：系统说了
+  `prefers-reduced-motion: reduce` 就摘掉 `autoplay` 再暂停一次，封面帧留在那儿。
+  这里不接管播放器，控件还是浏览器自己那套。
+
 ## 部署
 
 `.github/workflows/pages.yml` 在 `main` 每次 push 后把站点文件交给 `actions/deploy-pages`。工作流刻意**不写死文件清单**——只排除仓库自身的东西，新增的资源目录不用改工作流就会自动上线。
@@ -124,7 +153,8 @@ ffmpeg -ss 36 -t 2 -i media/demo.mp4 -af volumedetect -f null NUL
 
 ## 体积
 
-约 23.6MB，其中录屏 `media/demo.mp4` 占了 21.8MB，字体 1.55MB。
+约 24.8MB，其中录屏 `media/demo.mp4` 占了 21.8MB，宣传物料 1.04MB（氛围片 0.83MB + 四张图
+0.21MB），字体 1.55MB。
 `.gitattributes` 把二进制标成 `binary`，防止自动探测误判成文本、一次误判就让仓库膨胀数倍。
 mp4 那一条要写在通配符**下面**：通配符里的 `-text` 会被后面的 `* text=auto` 盖掉，
 对 mp4 真正生效的只有 `-diff`，22MB 的片子一旦被误判成文本、重新编码，就是一份几十 MB 的假 diff。

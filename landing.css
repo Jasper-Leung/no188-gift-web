@@ -355,6 +355,71 @@ main {
   display: block;
 }
 
+/* ---------------------------------------------------------------- 宣传物料
+ * 氛围片与三张静帧是**摄影**，不是游戏画面。所以给它们一套相框式排版
+ * （深底 16:9 + 图注），和上面那些纸色卡片在形状上分开：两类画面在同一页上，
+ * 靠形状就能分，不必让读者读小字去分。
+ */
+.promo {
+  margin: 0 0 1.75rem;
+}
+/**
+ * 相框只包住 video，图注在框外——`.promo`（figure）自己不设 aspect-ratio。
+ *
+ * 这不是风格问题：把图注放进一个带 aspect-ratio 的 overflow:hidden 盒子里，
+ * 盒高会被锁死成 16:9，图注排在 video 之后就被整个裁掉，页面上直接看不见。
+ */
+.promo-frame {
+  aspect-ratio: 16 / 9;
+  background: #10131a;
+  border: 1px solid var(--rule-strong);
+  border-radius: 2px;
+  overflow: hidden;
+}
+/**
+ * `object-fit: cover` 在这条上是必须的，不是顺手加的。
+ *
+ * 源片 864×496 是 1.742，比 16:9 的 1.778 略窄；而 `.video-frame video`
+ * 只写了 width/height 100%、没有 object-fit——照抄过来就是横向拉伸约 2%，
+ * 一张正对着光拍的静物，拉没拉长看得出来。cover 改成裁掉上下各约 5px。
+ */
+.promo-frame video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.promo-cap {
+  margin: 0.6rem 0 0;
+  font-size: 0.82rem;
+  color: var(--ink-dim);
+}
+
+.promo-stills {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+  gap: 1.25rem;
+  margin: 0 0 1.5rem;
+}
+.promo-stills figure {
+  margin: 0;
+}
+.promo-stills img {
+  width: 100%;
+  height: auto;
+  /* 三张都是 16:9，但宽度不同（1280 与降采样后的），钉住比例它们才会一样高 */
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  border: 1px solid var(--rule-strong);
+  border-radius: 2px;
+}
+.promo-stills figcaption {
+  margin-top: 0.5rem;
+  font-size: 0.78rem;
+  line-height: 1.55;
+  color: var(--ink-dim);
+}
+
 .notes {
   margin: 0 0 1rem;
   padding: 0;
@@ -699,6 +764,9 @@ code[data-todo]::after {
   .lang-toggle,
   .skip-link,
   .copy,
+  /* 相框本身也要收起来：里面那支 video 被藏掉之后，它只剩一个空的深色方块。
+     三张静帧是照片，照常印。 */
+  .promo-frame,
   video {
     display: none;
   }

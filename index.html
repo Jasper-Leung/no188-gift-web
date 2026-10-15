@@ -488,6 +488,147 @@
         </div>
       </section>
 
+      <!-- ==================== 宣传物料 ==================== -->
+      <!--
+        这一段是**宣传物料**，不是游戏画面：一支氛围片加三张静帧，都由 TapNow 生成。
+
+        为什么必须自己说清楚是生成的：上面 01 号卡片特地写了「真实按键 · 非生成画面」，
+        录屏的可信度整个架在那句话上。生成的画面如果含糊地摆在旁边，读者会默认它也是实录，
+        那句话就当场作废。所以这里既不藏在角落，也不蹭那份可信——单开一节，标题、图注、
+        正文各标一次，用深底相框和纸色卡片在形状上也分开。
+
+        位置放在「这是什么」之后：上一节刚讲完五件乐事（云、茶、琴、竹、禽），
+        这一节就拍的是其中的「茶」，接得住。
+      -->
+      <section id="promo" class="section">
+        <h2 class="section-title">
+          <span class="zh">宣传物料</span><span class="en">Promotional material</span>
+        </h2>
+        <p class="lede">
+          <span class="zh"
+            >清晨的光，一杯放下的茶——为「茶」这一乐事拍的一支氛围片，配三张静帧。
+            <b>这些是 AI 生成的画面（TapNow），不是游戏实录</b>；游戏本身长什么样，看上面 01 号那张录屏。</span
+          ><span class="en"
+            >Morning light and a cup set down — a mood film for the tea joy, with three stills.
+            <b>These frames are AI-generated (TapNow), not gameplay</b>; for what the game actually looks like,
+            watch the recording in card 01 above.</span
+          >
+        </p>
+
+        <figure class="promo">
+          <!-- 相框（aspect-ratio + overflow:hidden）只包住 video，图注留在框**外面**。
+               图注要是放进框里，就会被那条 aspect-ratio 连同 overflow 一起裁掉。 -->
+          <div class="promo-frame">
+            <video
+              id="promo-video"
+              autoplay
+              muted
+              loop
+              playsinline
+              controls
+              preload="metadata"
+              poster="media/promo-morning-poster.jpg"
+              aria-label="宣传氛围片：清晨放茶 / promo mood film: morning, tea set down"
+            >
+              <source src="media/promo-morning.mp4" type="video/mp4" />
+              <span class="zh"
+                >你的浏览器不放内嵌视频，<a href="media/promo-morning.mp4">点这里下载 mp4</a>。</span
+              ><span class="en"
+                >Your browser will not play this inline —
+                <a href="media/promo-morning.mp4">download the mp4</a>.</span
+              >
+            </video>
+          </div>
+          <figcaption class="promo-cap">
+            <span class="zh"
+              >镜头 1 · 清晨放茶 · 5.0 秒静音循环 · 864×496 · 无音轨 · AI 生成（TapNow）</span
+            ><span class="en"
+              >Shot 1 · morning, tea set down · 5.0 s silent loop · 864×496 · no audio track · AI-generated
+              (TapNow)</span
+            >
+          </figcaption>
+        </figure>
+
+        <div class="promo-stills">
+          <figure>
+            <img
+              src="media/promo-still-two-cups.jpg"
+              alt="清晨的客厅，两杯新茶放在矮桌上，阳光穿过窗帘。Two cups of new tea on a low table in morning light."
+              width="1280"
+              height="720"
+              loading="lazy"
+            />
+            <figcaption>
+              <span class="zh">成片 · 清晨闭环 · 两杯新茶</span>
+              <span class="en">Final · morning loop · two cups of new tea</span>
+            </figcaption>
+          </figure>
+
+          <figure>
+            <img
+              src="media/promo-style-a.jpg"
+              alt="清晨，一道光斜落在矮桌上，一只杯子冒着热气。A single cup under a beam of morning light."
+              width="1280"
+              height="720"
+              loading="lazy"
+            />
+            <figcaption>
+              <span class="zh">风格候选 A · 清晨</span>
+              <span class="en">Style candidate A · morning</span>
+            </figcaption>
+          </figure>
+
+          <figure>
+            <img
+              src="media/promo-style-c.jpg"
+              alt="黄昏，两杯茶摆在暗下来的房间里，窗外是城市的暮色。Two cups in a dim room at dusk."
+              width="1280"
+              height="720"
+              loading="lazy"
+            />
+            <figcaption>
+              <span class="zh">风格候选 C · 两杯茶（未采用）</span>
+              <span class="en">Style candidate C · two cups (not used)</span>
+            </figcaption>
+          </figure>
+        </div>
+
+        <ul class="notes">
+          <li>
+            <span class="zh"
+              ><b>为什么是「茶」。</b>故事里有五件乐事——云、茶、琴、竹、禽；茶是其中最一眼看得懂的那件，
+              也最接近一间驿站真正在做的事：烧水、放下、等它凉一点。</span
+            ><span class="en"
+              ><b>Why tea.</b> The story has five small joys — cloud, tea, zither, bamboo, bird; tea is the one that
+              reads at a glance, and the closest to what an inn actually does: boil water, set it down, wait for it to
+              cool a little.</span
+            >
+          </li>
+          <li>
+            <span class="zh"
+              ><b>方向定在清晨。</b>候选里另有一版更暗的黄昏调（候选 C），最后没有采用：故事是从清晨开始的，
+              这一页本身也是纸色——黄昏那张摆在中间，像另一部片子。</span
+            ><span class="en"
+              ><b>The direction settled on morning.</b> A darker dusk grade was also explored (candidate C) and left
+              unused: the story opens in the morning and this page is paper-coloured — the dusk frame sat in the middle
+              looking like a different film.</span
+            >
+          </li>
+          <li>
+            <span class="zh"
+              >循环播放、没有声音（源文件就没有音轨）；系统开了「减少动态效果」时停在封面帧上。
+              封面帧是从片子里 <code>t=2.5s</code> 抽的；三张静帧都是 1280×720——两张候选由 TapNow 的
+              2560×1440 原件降采样而来，成片那张本来就是 1280×720。</span
+            ><span class="en"
+              >It loops silently (the source has no audio track) and holds on the poster frame when the system asks for
+              reduced motion. The poster is a frame pulled from the film at <code>t=2.5s</code>; the three stills are all
+              1280×720 — the two candidates downsampled from TapNow's 2560×1440 originals, the final one already
+              1280×720.</span
+            >
+          </li>
+        </ul>
+      </section>
+
       <!-- ==================== 工程 ==================== -->
       <section id="tech" class="section">
         <h2 class="section-title">
