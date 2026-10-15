@@ -4,5 +4,11 @@ _site/
 # 本地一次性脚本与探针的暂存（同步页面用的 copy-submission.mjs 之类）
 .cache/
 
+# 本地 agent 的工作状态（记忆、探针），不是站点文件。
+# 更要紧的是 pages.yml 用**排除列表**收集站点文件：根目录里除 .git/.github/
+# .gitattributes/.gitignore/README.md 之外的一切都会上线——它一旦被 git add -A
+# 带进提交，就会连同一个能访问的 URL 一起发到线上。
+.workbuddy-ai/
+
 # 只有切字体（npm run font）才用得上，产物 fonts/ui.woff2 已入库
 node_modules/
