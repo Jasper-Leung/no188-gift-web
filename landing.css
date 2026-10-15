@@ -614,6 +614,46 @@ code[data-todo]::after {
   color: var(--ink-soft);
 }
 
+/* ---------------------------------------------------------------- 联系开发者 */
+/* 微信二维码是竖长的手机截图：装进一只白纸框里当相片摆，宽度锁上限、
+   高度 auto——竖图跟着框走，不会被栏宽抻成横幅。 */
+.qr {
+  display: flex;
+  flex-wrap: wrap;
+  gap: clamp(1.5rem, 4vw, 2.75rem);
+  align-items: flex-start;
+}
+.qr-card {
+  flex: 0 0 auto;
+  width: min(15.5rem, 100%);
+  margin: 0;
+  padding: 0.7rem 0.7rem 0;
+  background: #fff;
+  border: 1px solid var(--rule-strong);
+  border-radius: 3px;
+  box-shadow: var(--shadow);
+}
+.qr-card img {
+  width: 100%;
+  height: auto;
+  border-radius: 2px;
+}
+.qr-card figcaption {
+  padding: 0.65rem 0.2rem 0.75rem;
+  font-size: 0.78rem;
+  line-height: 1.5;
+  color: var(--ink-dim);
+  text-align: center;
+}
+.qr-notes {
+  flex: 1 1 20rem;
+  margin: 0;
+}
+.qr-notes b {
+  font-weight: 400;
+  color: var(--seal-deep);
+}
+
 /* ---------------------------------------------------------------- 页脚 */
 .foot {
   max-width: 62rem;
@@ -644,6 +684,10 @@ code[data-todo]::after {
   .facts th {
     width: 50%;
   }
+  /* 窄屏二维码居中摆： flex 换行后它自己占一行，居中比贴左更像一张摆出来的相片 */
+  .qr {
+    justify-content: center;
+  }
 }
 
 /* ---------------------------------------------------------------- 打印
@@ -663,6 +707,10 @@ code[data-todo]::after {
     font-size: 11pt;
   }
   .card {
+    box-shadow: none;
+    break-inside: avoid;
+  }
+  .qr-card {
     box-shadow: none;
     break-inside: avoid;
   }
