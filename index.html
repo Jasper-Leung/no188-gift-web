@@ -2,21 +2,40 @@
 <html lang="zh-Hans" data-lang="zh">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#e8e0cd" />
-    <meta http-equiv="X-Content-Type-Options" content="nosniff" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <!--
+      安全头。GitHub Pages 不让自定义响应头，能在页面里声明的只有 CSP 与 Referrer。
+      这一页没有任何第三方资源、没有内联脚本和内联样式，所以策略可以收到只认自己：
+      哪天有人往页面里塞了外链脚本或 style="" 属性，浏览器会当场拦下并在控制台报错，
+      而不是悄悄放行。img-src 多放一个 data: 是给 landing.css 里那张纸纹（内联 SVG）。
+
+      早先这里写的是 <meta http-equiv="X-Content-Type-Options">——那个头**只认 HTTP
+      响应头**，写成 meta 浏览器直接忽略，等于没有，所以拿掉了。
+    -->
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; media-src 'self'; font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'; frame-src 'none'; upgrade-insecure-requests"
+    />
+    <meta name="referrer" content="strict-origin-when-cross-origin" />
+    <meta name="theme-color" content="#ede6d6" />
     <title>Gift No.188 · 188号礼物 — 官方网站</title>
     <meta
       name="description"
       content="Gift No.188 / 188号礼物 — 一条 1228.8 米的 8 字形山路，16 座驿站，15 枚碎片，最后压成一张可以手写的明信片。官方网站：演示录屏、在线 Demo、下载入口都在这一页。"
     />
+    <!-- og:image / og:url 必须是绝对地址：抓取方（微信、Slack、X）不会替你拼相对路径 -->
     <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://jasper-leung.github.io/no188-gift-web/" />
     <meta property="og:title" content="Gift No.188 · 188号礼物 · 官方网站" />
     <meta
       property="og:description"
       content="一条 1228.8 米的 8 字形山路，16 座驿站，15 枚碎片，最后压成一张可以手写的明信片。"
     />
-    <meta property="og:image" content="media/poster.jpg" />
+    <meta property="og:image" content="https://jasper-leung.github.io/no188-gift-web/media/hero.jpg" />
+    <meta property="og:image:width" content="1920" />
+    <meta property="og:image:height" content="1072" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="icon" href="favicon.svg" type="image/svg+xml" />
 
     <!--
       字体是 LXGW WenKai 按 **GB2312 全集**切的子集（7722 字 / 1.55 MB，见 tools/subset-font.mjs）。
@@ -30,20 +49,92 @@
 
       preload 只为让 `font-display: swap` 的替换来得早一点；真到不了就晚点换，
       文字不会空着（1.55MB 是子集化的结果，不是完整字库）。
+
+      另有三款**只含拉丁字符**的 OFL 字体（fonts/latin/，共约 115 KB）：Instrument Serif
+      做大标题与数字，IBM Plex Mono 做小号的标注，Newsreader 只在英文版当正文——中文页
+      根本不会去下载它。中文字符永远落到上面那份文楷上。
     -->
     <link rel="preload" href="fonts/ui.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="fonts/latin/instrument-serif.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="preload" href="media/hero.jpg" as="image" />
     <link rel="stylesheet" href="landing.css" />
   </head>
-  <body>
+  <body id="top">
     <a class="skip-link" href="#deliverables">
       <span class="zh">跳到三件交付物</span><span class="en">Skip to deliverables</span>
     </a>
 
-    <!-- ============================ 抬头 ============================ -->
-    <header class="hero">
+    <!-- ============================ 导航 ============================
+         固定在顶上。没有脚本时它一直是半透明纸色；脚本在首屏时给它挂上
+         .at-top，退成透明、直接压在主视觉上。底边那条朱线是阅读进度。 -->
+    <header class="nav" data-nav>
+      <div class="nav-inner">
+        <a class="brand" href="#top" aria-label="Gift No.188">
+          <span class="seal" aria-hidden="true">188</span>
+          <span class="brand-word">Gift <i>No.</i>188</span>
+        </a>
+
+        <nav class="nav-links" aria-label="页面导航 / Sections">
+          <a href="#video"><span class="zh">录屏</span><span class="en">Film</span></a>
+          <a href="#demo"><span class="zh">试玩</span><span class="en">Play</span></a>
+          <a href="#download"><span class="zh">下载</span><span class="en">Download</span></a>
+          <a href="#about"><span class="zh">故事</span><span class="en">Story</span></a>
+          <a href="#promo"><span class="zh">物料</span><span class="en">Promo</span></a>
+          <a href="#tech"><span class="zh">工程</span><span class="en">Engineering</span></a>
+          <a href="#contact"><span class="zh">联系</span><span class="en">Contact</span></a>
+        </nav>
+
+        <div class="nav-actions">
+          <button class="lang-toggle" type="button" data-lang-toggle aria-label="切换语言 / Switch language">
+            <span class="lang-opt lang-zh">中</span><span class="lang-opt lang-en">EN</span>
+          </button>
+          <a
+            class="btn btn-primary btn-sm nav-cta"
+            data-cfg="demoUrl"
+            href="https://jasper-leung.github.io/188js/?"
+            target="_blank"
+            rel="noopener"
+          >
+            <span class="zh">在线试玩</span><span class="en">Play</span>
+          </a>
+          <!-- 窄屏菜单用 <details>：不靠脚本也能开合 -->
+          <details class="nav-menu" data-nav-menu>
+            <summary aria-label="菜单 / Menu">
+              <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+                <path d="M4 9h16M4 15h16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+              </svg>
+            </summary>
+            <div class="nav-sheet">
+              <a href="#video"><i>01</i><span class="zh">演示录屏</span><span class="en">Film</span></a>
+              <a href="#demo"><i>02</i><span class="zh">在线试玩</span><span class="en">Play online</span></a>
+              <a href="#download"><i>03</i><span class="zh">下载</span><span class="en">Download</span></a>
+              <a href="#about"><i>04</i><span class="zh">故事</span><span class="en">Story</span></a>
+              <a href="#promo"><i>05</i><span class="zh">宣传物料</span><span class="en">Promo</span></a>
+              <a href="#tech"><i>06</i><span class="zh">工程与实测</span><span class="en">Engineering</span></a>
+              <a href="#contact"><i>07</i><span class="zh">联系开发者</span><span class="en">Contact</span></a>
+            </div>
+          </details>
+        </div>
+      </div>
+      <span class="nav-progress" aria-hidden="true" data-progress></span>
+    </header>
+
+    <!-- ============================ 抬头 ============================
+         一幅山水，右上角题一行款、钤一方印——这是这类画本来的样子。
+         页面的字退到左下角，不去和画抢。 -->
+    <section class="hero" data-hero>
+      <!-- 主视觉是游戏自己的标题美术（八字山路），不是另找的图——页面和产品是同一件东西 -->
       <div class="hero-art" aria-hidden="true">
-        <img src="media/hero.jpg" alt="" width="1920" height="1080" fetchpriority="high" />
+        <img src="media/hero.jpg" alt="" width="1920" height="1072" fetchpriority="high" data-parallax />
+      </div>
+
+      <!-- 题款：竖排。「188」用直排内横排（text-combine-upright），印文是「八字山路」 -->
+      <div class="inscription" aria-hidden="true">
+        <div class="ins-main">
+          <p class="ins-title"><span class="tcy">188</span>号礼物</p>
+          <span class="ins-seal"><i>八</i><i>字</i><i>山</i><i>路</i></span>
+        </div>
+        <p class="ins-verse">守碑人记得这条路<br />不记得自己</p>
       </div>
 
       <div class="hero-body">
@@ -52,26 +143,18 @@
         </p>
 
         <h1 class="hero-title">
-          <span class="latin">GIFT NO.188</span>
-          <span class="hero-title-zh"><span class="zh">188号礼物</span><span class="en">Gift No.188</span></span>
+          <span class="ht-latin">Gift <em>No.</em>188</span>
+          <span class="visually-hidden">188号礼物</span>
         </h1>
 
         <p class="hero-line">
           <span class="zh"
-            >三十天，把母亲留下的驿站重新开张，否则土地被依法收回。
-            而那条上山的路，是个「8」字。</span
+            >三十天，把母亲留下的驿站重新开张，否则土地被依法收回。<br />而那条上山的路，是个「8」字。</span
           ><span class="en"
             >Thirty days to reopen the inn his mother left him — or the law takes the land.
             And the road up there is a figure eight.</span
           >
         </p>
-
-        <ul class="hero-facts">
-          <li><b>1,228.8 m</b><span class="zh">环线长 · 961 个中线点</span><span class="en">loop · 961 centreline points</span></li>
-          <li><b>16</b><span class="zh">座路边驿站</span><span class="en">roadside stations</span></li>
-          <li><b>15</b><span class="zh">枚碎片 → 一张明信片</span><span class="en">fragments → one postcard</span></li>
-          <li><b>20–30</b><span class="zh">分钟一程</span><span class="en">minutes a run</span></li>
-        </ul>
 
         <!--
           试玩地址末尾那个孤零零的 `?` 是**缓存开关**，不是手滑。
@@ -86,775 +169,1070 @@
         -->
         <p class="hero-cta">
           <a
-            class="btn btn-primary"
+            class="btn btn-primary btn-lg"
             data-cfg="demoUrl"
             href="https://jasper-leung.github.io/188js/?"
             target="_blank"
             rel="noopener"
           >
             <span class="zh">在线试玩</span><span class="en">Play online</span>
+            <span class="btn-arrow" aria-hidden="true"
+              ><svg class="i" viewBox="0 0 24 24"><path d="M5 12h13M13 6l6 6-6 6" /></svg
+            ></span>
           </a>
-          <a class="btn" href="#deliverables">
-            <span class="zh">录屏 · 下载</span><span class="en">Recording · Download</span>
+          <a class="btn btn-ghost btn-lg" href="#download">
+            <span class="zh">下载桌面版</span><span class="en">Desktop build</span>
           </a>
         </p>
+      </div>
 
+      <!-- 右下角一张「正在放映」：真画面的入口，和左边那幅画分开 -->
+      <a class="hero-reel" href="#video">
+        <span class="reel-thumb">
+          <img src="media/poster.jpg" alt="" width="1280" height="720" />
+          <span class="reel-play" aria-hidden="true"
+            ><svg class="i i-play" viewBox="0 0 24 24"><path d="M8 5.5v13l11-6.5z" /></svg
+          ></span>
+        </span>
+        <span class="reel-text">
+          <span class="reel-label">Reel 01 · 1:49</span>
+          <span class="reel-name"><span class="zh">看一遍实机录屏</span><span class="en">Watch the real thing</span></span>
+          <span class="reel-sub"><span class="zh">真实按键 · 非生成画面</span><span class="en">Real keystrokes, not generated</span></span>
+        </span>
+      </a>
+
+      <div class="hero-foot">
         <p class="hero-tools">
           <span class="zh">Three.js r169 · Blender（绑定与动画）· Tripo（3D 资产生成）· TypeScript · Vite</span>
           <span class="en">Three.js r169 · Blender (rigging &amp; animation) · Tripo (3D asset generation) · TypeScript · Vite</span>
         </p>
-
-        <button class="lang-toggle" type="button" data-lang-toggle>
-          <span class="zh">EN</span><span class="en">中文</span>
-        </button>
+        <a class="scroll-cue" href="#route"><span class="zh">向下</span><span class="en">Scroll</span><i aria-hidden="true"></i></a>
       </div>
-    </header>
+    </section>
 
     <main>
-      <!-- ==================== 三件交付物 ==================== -->
-      <section id="deliverables" class="section">
-        <h2 class="section-title">
-          <span class="zh">三件交付物</span><span class="en">Three deliverables</span>
-        </h2>
-        <p class="lede">
-          <span class="zh"
-            >录屏、在线 Demo、下载入口都在这一页上。免注册、免登录、不需要装任何东西。网页版有两个镜像，
-            任选一个都能玩；嫌加载慢就直接装桌面版。</span
-          ><span class="en"
-            >Recording, live demo and downloads all live on this page. No sign-up, nothing to install.
-            The web build is mirrored in two places — either one works; if loading feels slow, take the desktop build.</span
-          >
-        </p>
-
-        <!-- ---------- 01 录屏 ---------- -->
-        <article class="card" id="video">
-          <header class="card-head">
-            <span class="num">01</span>
-            <div>
-              <h3><span class="zh">演示录屏视频</span><span class="en">Demo screen recording</span></h3>
-              <p class="card-sub">
-                <span class="zh">本机实机录制 · 真实按键 · 非生成画面</span>
-                <span class="en">Captured on the real build with real keystrokes — not generated</span>
-              </p>
+      <!-- ==================== 壹 · 一条路 ==================== -->
+      <section id="route" class="section section-route">
+        <div class="wrap">
+          <header class="chapter">
+            <p class="chapter-rule" aria-hidden="true"><span>No. 01 — The Road</span><span>01 / 06</span></p>
+            <div class="chapter-grid">
+              <p class="chapter-num" aria-hidden="true">壹</p>
+              <div class="chapter-body">
+                <h2 class="chapter-title"><span class="zh">一条路</span><span class="en">The road</span></h2>
+                <p class="chapter-orn" aria-hidden="true"><span class="zh">The road</span><span class="en">一条路</span></p>
+              </div>
             </div>
           </header>
 
-          <figure class="video-frame">
-            <video
-              id="demo-video"
-              controls
-              playsinline
-              preload="metadata"
-              poster="media/poster.jpg"
-              data-cfg="videoPoster"
-              aria-label="Gift No.188 演示录屏 / demo screen recording"
+          <p class="statement">
+            <span class="zh"
+              >一圈 <em>1228.8</em> 米的山路，写成一个「8」。沿路 <em>16</em> 座驿站，其间散着 <em>15</em> 枚碎片——走到最后，它们被压成一张可以手写的明信片。</span
+            ><span class="en"
+              >One loop of mountain road, <em>1228.8</em> metres, written as an eight. <em>16</em> stations line it,
+              <em>15</em> fragments lie between them — and at the end they are pressed into a postcard you can write
+              on.</span
             >
-              <source src="media/demo.mp4" data-cfg="videoSrc" type="video/mp4" />
-              <span class="zh"
-                >你的浏览器不放内嵌视频，<a data-cfg="videoSrc" href="media/demo.mp4">点这里下载 mp4</a>。
-                <a data-cfg="videoSrc" href="media/demo.mp4" target="_blank" rel="noopener">或在新窗口打开</a>。</span
-              ><span class="en"
-                >Your browser will not play this inline —
-                <a data-cfg="videoSrc" href="media/demo.mp4">download the mp4</a>
-                <a data-cfg="videoSrc" href="media/demo.mp4" target="_blank" rel="noopener">or open it in a new tab</a>.</span
-              >
-            </video>
-          </figure>
+          </p>
 
           <!--
-            素材没跟这次构建走时（tools/build-submission.mjs 会在 <html> 上挂
-            data-missing="video"），播放器被收起、换成下面这句说明。
-            给评委一个点了没反应的播放器，比坦白说「这里没有视频」糟糕得多。
+            签名图：一个竖着的「8」，画成一张测绘图的样子。示意图，不按比例——16 个点沿弧长
+            等距撒开，朱色的 5 个是碎片驿站（5 件乐事 × 每件 3 次 = 15 枚碎片）。
+            进入视口时路自己画出来；路上那个朱点一直在骑。系统要求减少动态时两样都停。
           -->
-          <p class="media-note">
-            <span class="zh"
-              >这次构建没有把录屏文件带上（多半是跑了 <code>--no-media</code>）。母版在仓库的
-              <code>promo/footage/07-walkthrough-vo-web.mp4</code>。</span
-            ><span class="en"
-              >This build shipped without the recording bundled. The master is at
-              <code>promo/footage/07-walkthrough-vo-web.mp4</code>.</span
-            >
-          </p>
+          <div class="route-grid">
+            <figure class="route-map" data-route>
+              <svg viewBox="0 40 400 530" role="presentation" data-route-svg>
+              <defs>
+                <path id="loop" pathLength="100" d="M200.0 290.0 L193.2 297.3 L186.4 304.6 L179.7 311.9 L173.0 319.1 L166.5 326.4 L160.0 333.6 L153.6 340.7 L147.4 347.8 L141.3 354.8 L135.4 361.8 L129.8 368.7 L124.3 375.5 L119.0 382.2 L114.0 388.9 L109.3 395.4 L104.9 401.8 L100.7 408.2 L96.8 414.4 L93.3 420.4 L90.1 426.4 L87.2 432.2 L84.7 437.9 L82.5 443.4 L80.7 448.7 L79.3 454.0 L78.2 459.0 L77.5 463.9 L77.3 468.6 L77.4 473.2 L77.8 477.6 L78.7 481.8 L80.0 485.8 L81.6 489.7 L83.7 493.3 L86.1 496.8 L88.8 500.1 L92.0 503.2 L95.5 506.1 L99.3 508.8 L103.5 511.3 L108.1 513.7 L112.9 515.8 L118.0 517.7 L123.5 519.5 L129.2 521.0 L135.2 522.4 L141.4 523.6 L147.9 524.5 L154.6 525.3 L161.4 525.9 L168.5 526.3 L175.7 526.6 L183.1 526.6 L190.5 526.5 L198.1 526.2 L205.8 525.7 L213.5 525.1 L221.2 524.2 L229.0 523.3 L236.8 522.1 L244.5 520.8 L252.2 519.3 L259.8 517.7 L267.4 516.0 L274.8 514.0 L282.1 512.0 L289.2 509.8 L296.2 507.5 L303.0 505.0 L309.6 502.5 L315.9 499.8 L322.0 497.0 L327.9 494.0 L333.5 491.0 L338.7 487.8 L343.7 484.6 L348.3 481.3 L352.6 477.8 L356.6 474.3 L360.1 470.7 L363.4 467.0 L366.2 463.2 L368.6 459.4 L370.6 455.5 L372.3 451.5 L373.5 447.4 L374.3 443.3 L374.7 439.2 L374.6 434.9 L374.1 430.7 L373.3 426.3 L371.9 422.0 L370.2 417.6 L368.1 413.1 L365.5 408.6 L362.5 404.1 L359.1 399.6 L355.4 395.0 L351.2 390.4 L346.7 385.7 L341.8 381.1 L336.5 376.4 L331.0 371.7 L325.1 367.0 L318.8 362.2 L312.3 357.5 L305.5 352.7 L298.4 347.9 L291.1 343.1 L283.6 338.3 L275.8 333.5 L267.9 328.7 L259.8 323.9 L251.5 319.1 L243.1 314.2 L234.6 309.4 L226.1 304.5 L217.4 299.7 L208.7 294.8 L200.0 290.0 L191.4 285.9 L182.8 281.9 L174.3 277.8 L165.8 273.7 L157.5 269.6 L149.2 265.6 L141.1 261.5 L133.1 257.4 L125.3 253.4 L117.6 249.3 L110.2 245.3 L103.0 241.2 L96.1 237.2 L89.4 233.1 L83.0 229.1 L76.9 225.1 L71.1 221.1 L65.6 217.1 L60.4 213.1 L55.7 209.1 L51.2 205.1 L47.2 201.2 L43.5 197.2 L40.2 193.3 L37.4 189.4 L34.9 185.5 L32.8 181.7 L31.2 177.9 L30.0 174.1 L29.2 170.3 L28.8 166.6 L28.8 162.9 L29.3 159.2 L30.2 155.6 L31.5 152.0 L33.2 148.5 L35.3 145.0 L37.8 141.6 L40.7 138.3 L43.9 135.0 L47.6 131.7 L51.6 128.6 L55.9 125.5 L60.6 122.5 L65.6 119.5 L70.9 116.7 L76.5 113.9 L82.4 111.2 L88.6 108.6 L94.9 106.2 L101.6 103.8 L108.4 101.5 L115.4 99.3 L122.5 97.3 L129.9 95.3 L137.3 93.5 L144.9 91.8 L152.5 90.3 L160.2 88.8 L167.9 87.5 L175.7 86.4 L183.5 85.3 L191.2 84.5 L198.9 83.8 L206.6 83.2 L214.1 82.8 L221.6 82.5 L228.9 82.4 L236.1 82.5 L243.1 82.7 L249.9 83.1 L256.6 83.6 L263.0 84.4 L269.2 85.3 L275.1 86.3 L280.8 87.6 L286.2 89.0 L291.3 90.6 L296.1 92.4 L300.5 94.3 L304.7 96.5 L308.4 98.8 L311.9 101.2 L315.0 103.9 L317.7 106.7 L320.0 109.7 L321.9 112.9 L323.5 116.2 L324.7 119.7 L325.5 123.4 L325.9 127.2 L325.9 131.2 L325.5 135.3 L324.7 139.6 L323.6 144.1 L322.1 148.7 L320.1 153.4 L317.9 158.3 L315.2 163.3 L312.3 168.4 L308.9 173.7 L305.3 179.1 L301.3 184.6 L297.1 190.2 L292.5 195.9 L287.6 201.7 L282.5 207.6 L277.2 213.6 L271.6 219.7 L265.8 225.9 L259.8 232.1 L253.6 238.4 L247.2 244.7 L240.8 251.1 L234.2 257.5 L227.5 264.0 L220.7 270.4 L213.8 277.0 L206.9 283.5Z" />
+                <!-- 第二次穿过路口的那一段，再画一遍压在上面——做出画里那座跨线桥。
+                     桥两侧先垫一圈纸色（bridge-gap），下面那条路在桥边断开，像绳结图那样分出上下 -->
+                <path id="bridge" d="M253.6 238.4 L247.2 244.7 L240.8 251.1 L234.2 257.5 L227.5 264.0 L220.7 270.4 L213.8 277.0 L206.9 283.5 L200.0 290.0 L193.2 297.3 L186.4 304.6 L179.7 311.9 L173.0 319.1 L166.5 326.4 L160.0 333.6 L153.6 340.7 L147.4 347.8" />
+                <path id="bridge-gap" d="M234.2 257.5 L227.5 264.0 L220.7 270.4 L213.8 277.0 L206.9 283.5 L200.0 290.0 L193.2 297.3 L186.4 304.6 L179.7 311.9 L173.0 319.1 L166.5 326.4" />
+                <clipPath id="map-clip"><rect x="2" y="42" width="396" height="526" /></clipPath>
+              </defs>
+              <!-- 图框：一圈刻度，像一张测绘图 -->
+              <rect class="map-frame" x="2" y="42" width="396" height="526" />
+              <path class="map-ticks" d="M40 42v6M40 568v-6 M80 42v6M80 568v-6 M120 42v6M120 568v-6 M160 42v6M160 568v-6 M200 42v6M200 568v-6 M240 42v6M240 568v-6 M280 42v6M280 568v-6 M320 42v6M320 568v-6 M360 42v6M360 568v-6 M2 80h6M398 80h-6 M2 120h6M398 120h-6 M2 160h6M398 160h-6 M2 200h6M398 200h-6 M2 240h6M398 240h-6 M2 280h6M398 280h-6 M2 320h6M398 320h-6 M2 360h6M398 360h-6 M2 400h6M398 400h-6 M2 440h6M398 440h-6 M2 480h6M398 480h-6 M2 520h6M398 520h-6" />
+              <g class="map-contours" clip-path="url(#map-clip)">
+                <ellipse cx="178" cy="168" rx="70" ry="40" transform="rotate(-9 178 168)" />
+                <ellipse cx="178" cy="168" rx="124" ry="68" transform="rotate(-9 178 168)" />
+                <ellipse cx="178" cy="168" rx="185" ry="98" transform="rotate(-9 178 168)" />
+                <ellipse cx="178" cy="168" rx="255" ry="130" transform="rotate(-9 178 168)" />
+                <ellipse cx="226" cy="438" rx="80" ry="46" transform="rotate(-9 226 438)" />
+                <ellipse cx="226" cy="438" rx="141" ry="78" transform="rotate(-9 226 438)" />
+                <ellipse cx="226" cy="438" rx="212" ry="113" transform="rotate(-9 226 438)" />
+                <ellipse cx="226" cy="438" rx="291" ry="150" transform="rotate(-9 226 438)" />
+              </g>
+              <g class="route-road">
+                <use href="#loop" class="road-edge draw" />
+                <use href="#loop" class="road-bed draw" />
+                <use href="#loop" class="road-line" />
+                <g class="road-bridge">
+                  <use href="#bridge-gap" class="road-gap" />
+                  <use href="#bridge" class="road-edge" />
+                  <use href="#bridge" class="road-bed" />
+                </g>
+              </g>
+              <g class="route-stations">
+                <g><circle cx="166.3" cy="326.7" r="4.2" /><text x="153.7" y="318.3">01</text></g>
+                <g class="frag"><circle class="st-ring" cx="103.5" cy="403.9" r="11" /><circle cx="103.5" cy="403.9" r="6" /><text x="86.8" y="395.9">02</text></g>
+                <g><circle cx="85.4" cy="495.8" r="4.2" /><text x="71.4" y="508.4">03</text></g>
+                <g><circle cx="176.8" cy="526.6" r="4.2" /><text x="176.8" y="546.6">04</text></g>
+                <g class="frag"><circle class="st-ring" cx="275.3" cy="513.9" r="11" /><circle cx="275.3" cy="513.9" r="6" /><text x="280.6" y="536.2">05</text></g>
+                <g><circle cx="362.3" cy="468.2" r="4.2" /><text x="375.0" y="482.5">06</text></g>
+                <g class="frag"><circle class="st-ring" cx="342.7" cy="382.0" r="11" /><circle cx="342.7" cy="382.0" r="6" /><text x="356.4" y="370.4">07</text></g>
+                <g><circle cx="261.4" cy="324.8" r="4.2" /><text x="270.0" y="313.2">08</text></g>
+                <g><circle cx="173.8" cy="277.5" r="4.2" /><text x="166.4" y="295.9">09</text></g>
+                <g><circle cx="85.8" cy="230.9" r="4.2" /><text x="76.8" y="248.3">10</text></g>
+                <g class="frag"><circle class="st-ring" cx="30.1" cy="156.0" r="11" /><circle cx="30.1" cy="156.0" r="6" /><text x="10.7" y="154.1">11</text></g>
+                <g><circle cx="109.4" cy="101.2" r="4.2" /><text x="104.3" y="88.0">12</text></g>
+                <g><circle cx="207.1" cy="83.2" r="4.2" /><text x="206.2" y="69.2">13</text></g>
+                <g class="frag"><circle class="st-ring" cx="304.7" cy="96.5" r="11" /><circle cx="304.7" cy="96.5" r="6" /><text x="313.9" y="81.8">14</text></g>
+                <g><circle cx="303.1" cy="182.1" r="4.2" /><text x="316.9" y="195.1">15</text></g>
+                <g><circle cx="236.1" cy="255.7" r="4.2" /><text x="247.9" y="270.9">16</text></g>
+              </g>
+              <!-- 一个骑车的人，沿路一直在走；系统要求减少动态时由脚本停住 -->
+              <g class="rider">
+                <circle class="rider-halo" r="9" />
+                <circle class="rider-dot" r="4.5" />
+                <animateMotion dur="26s" repeatCount="indefinite" rotate="0"><mpath href="#loop" /></animateMotion>
+              </g>
+              <g class="map-compass" transform="translate(360 84)">
+                <circle r="15" />
+                <path d="M0 -11 L4 2 L0 -1 L-4 2Z" />
+                <text y="-19">N</text>
+              </g>
+            </svg>
+              <figcaption class="route-legend">
+                <span><i class="dot dot-frag"></i><span class="zh">碎片驿站 × 5</span><span class="en">Fragment stations × 5</span></span>
+                <span><i class="dot"></i><span class="zh">路边驿站 × 11</span><span class="en">Roadside stations × 11</span></span>
+                <span class="route-note"><span class="zh">示意图，不按比例</span><span class="en">Schematic, not to scale</span></span>
+              </figcaption>
+            </figure>
 
-          <p class="card-meta">
-            <span class="zh"
-              >实录 1920×1080 · 网页版 1280×720 / 30fps · <span  data-cfg="videoDuration">1:49</span> ·
-              <span  data-cfg="videoSize">21.76 MB</span> · 直链播放，无需登录</span
-            ><span class="en"
-              >Recorded 1920×1080 · web 1280×720 / 30fps · <span  data-cfg="videoDuration">1:49</span> ·
-              <span  data-cfg="videoSize">21.76 MB</span> · direct link, no login</span
-            >
-          </p>
-
-          <ul class="notes">
-            <li>
-              <span class="zh"
-                >1 分 49 秒一镜到底：标题页 → 引导页 → 进世界 → 序章 → 上路 → 骑完整整一圈
-                1228.8 m → 花房·禽语湖湾打卡 → 小游戏 → 退出面板 → 回到起点。</span
-              ><span class="en"
-                >1:49, one continuous session: title → tutorial → world → prologue → on the road →
-                the full 1228.8 m lap → a fragment station → a minigame → back to the start.</span
-              >
-            </li>
-            <li>
-              <span class="zh"
-                >真人操作链路：点按钮、按方向键、走游戏自己的相机。没有导轨机位，也没有后期生成的画面。</span
-              ><span class="en"
-                >A real session — actual button clicks, real keypresses, the game's own camera.
-                No dolly rigs, no generated shots.</span
-              >
-            </li>
-            <li>
-              <span class="zh"
-                >英配解说（20 句旁白），<b>字幕已烧进画面</b>——静音也看得懂，不开声音不损失任何一句。</span
-              ><span class="en"
-                >English narration (20 cues) with the subtitles <b>burned into the picture</b> — watch it on mute and
-                you lose no line.</span
-              >
-            </li>
-            <li>
-              <span class="zh"
-                >它骑的是自行车、只打了 1/5 块碎片——这是一次真实的通关尝试，不是宣传片。</span
-              ><span class="en"
-                >It rides the bicycle the whole way and collects one fragment of five — a real playthrough
-                attempt, not a promo cut.</span
-              >
-            </li>
-          </ul>
-
-          <p class="alt-links">
-            <a data-cfg="videoSrc" href="media/demo.mp4" download
-              ><span class="zh">直接下载 mp4</span><span class="en">Download the mp4</span></a
-            >
-            ·
-            <a data-cfg="videoSrc" href="media/demo.mp4" target="_blank" rel="noopener"
-              ><span class="zh">新窗口打开</span><span class="en">Open in a new tab</span></a
-            >
-          </p>
-        </article>
-
-        <!-- ---------- 02 在线 Demo ---------- -->
-        <!--
-          两个镜像。GitHub Pages 放前面是有原因的：workers.dev 在部分网络（尤其大陆）
-          会被 DNS 劫持，实测连不上，而评委多半就在那样的网络里。主按钮给能打开的那个。
-        -->
-        <article class="card" id="demo">
-          <header class="card-head">
-            <span class="num">02</span>
-            <div>
-              <h3><span class="zh">在线 Demo</span><span class="en">Live demo</span></h3>
-              <p class="card-sub">
-                <span class="zh">浏览器直接运行 · 点开即玩 · 两个镜像任选其一</span>
-                <span class="en">Runs in the browser · nothing to install · two mirrors, pick either</span>
-              </p>
-            </div>
-          </header>
-
-          <p class="cta-big">
-            <a
-              class="btn btn-primary btn-big"
-              data-cfg="demoUrl"
-              href="https://jasper-leung.github.io/188js/?"
-              target="_blank"
-              rel="noopener"
-            >
-              <span class="zh">打开在线 Demo</span><span class="en">Open the live demo</span>
-            </a>
-            <a
-              class="btn btn-big"
-              data-cfg="demoUrlAlt"
-              href="https://gift-no188.jasperaptx4868.workers.dev/"
-              target="_blank"
-              rel="noopener"
-            >
-              <span class="zh">备用镜像</span><span class="en">Backup mirror</span>
-            </a>
-          </p>
-
-          <p class="url-row">
-            <code id="demo-url-gh" data-cfg="demoUrl">https://jasper-leung.github.io/188js/?</code>
-            <button class="copy" type="button" data-copy="#demo-url-gh">
-              <span class="zh">复制</span><span class="en">Copy</span>
-            </button>
-          </p>
-
-          <p class="url-row">
-            <code id="demo-url-cf" data-cfg="demoUrlAlt">https://gift-no188.jasperaptx4868.workers.dev/</code>
-            <button class="copy" type="button" data-copy="#demo-url-cf">
-              <span class="zh">复制</span><span class="en">Copy</span>
-            </button>
-          </p>
-
-          <p class="notes-hint">
-            <span class="zh">备用镜像（Cloudflare）在部分网络下打不开——workers.dev 常被 DNS 拦掉，打不开就用上面那个。</span
-            ><span class="en"
-              >The Cloudflare mirror is unreachable on some networks — <code>workers.dev</code> is often DNS-blocked. If it
-              doesn't open, use the first one.</span
-            >
-          </p>
-
-          <ul class="notes">
-            <li>
-              <span class="zh"
-                ><b>模型要现下，网页版起步慢。</b>三个资源加起来约 21 MB，其中模型占 16.84 MB（81%）；
-                网络一般时，进度条会在模型上停挺久。介意的话装桌面版——同一份内容，装完本地加载，
-                打开就是进世界，没有下载过程。</span
-              ><span class="en"
-                ><b>Models are fetched on the spot, so the web build starts slowly.</b> The payload is ~21 MB, of
-                which models are 16.84 MB (81%); on a middling connection the progress bar sits there for a while.
-                If that bothers you, take the desktop installer — the same content, loaded locally, straight into the
-                world with nothing to download.</span
-              >
-            </li>
-            <!--
-              这一条不是免责声明，是实机行为。摩托车 4.82 MB，被故意挂在启动链**外面**单跑
-              （world.ts: `loadMotorcycleModel` 不并进 `loadVehicleExtras`），
-              而 `Vehicle.canEnter()` 在模型到位前恒为假——所以 E 只会跳过还没到的车，
-              不会把你切进一辆看不见的车。
-
-              **自动上车那一半不是「可以」，是「已经」**（main.ts 的 P1-6 落点）：
-              自行车模型到位时，如果 `vehicleTouched` 还是假（玩家没按过 E），游戏会
-              直接 `vehicle.set('bike')`。所以默认的起手状态就是骑车——录屏里那条
-              自行车（顶速 15 m/s，而徒步上限 6 m/s）就是这么来的。
-              写这段时如果只讲「按 E 切换」，就漏掉了不按键的人默认看到什么。
-            -->
-            <li>
-              <span class="zh"
-                ><b>开局直接给你一辆自行车。</b>三种车分批现下：2.79 MB 的自行车跟着启动链走，
-                4.82 MB 的摩托车则被单独挂在链外单跑，免得它拖住整批。所以<b>自行车模型一落地，
-                只要你自己没按过 <code>E</code>，游戏就先把人放上车</b>——这是「开局不要走路」那条
-                决定的落点。等进度条把剩下的模型跑完，<code>E</code> 才会把摩托车和滑板一起串进来。
-                模型没到位的车会被直接跳过，不会切到一个看不见的车。</span
-              ><span class="en"
-                ><b>You start on the bicycle.</b> The three rides load in separate batches: the 2.79 MB bicycle rides the
-                boot chain, while the 4.82 MB motorcycle is deliberately kept outside it so it can't hold up the whole
-                batch. So the moment the bicycle model lands — <b>as long as you haven't touched <code>E</code> yet — the
-                game puts you on it</b> rather than opening a game about cycling with a walk. Once the progress bar has
-                pulled in the rest, <code>E</code> picks up the motorcycle and skateboard too. Rides whose models haven't
-                landed are skipped outright rather than switched into empty air.</span
-              >
-            </li>
-            <li><span class="zh">首屏 3.45 MB，之后按需加载；弱机走最低档也能跑。</span><span class="en">3.45 MB to first playable frame, then on demand — the low tier holds up on weak hardware.</span></li>
-            <!--
-              标题页那两颗按钮不是摆设：第二颗是「演示 · 90 秒」，替评审自己骑一遍，
-              不用碰键盘。这是给「只想看三十秒、不打算玩」的人准备的口子，
-              所以把它写进正文，而不是留在录屏里一带而过。
-            -->
-            <li>
-              <span class="zh"
-                ><b>不想动手也有得看。</b>标题页第二颗按钮是「演示 · 90 秒」——车自己往前骑，你的手不用碰键盘。
-                九十秒预算到点会自己收场进结算页（所以它真的会结束）；第 62 秒之后不再玩小游戏，
-                到站直接记一次拜访，不判你输。想自己开，就点左边那颗「开启旅程」。</span
-              ><span class="en"
-                ><b>You don't have to drive to see it.</b> The second button on the title screen is
-                <b>Demo · 90s</b>: the bike rides itself, no keys required. The 90-second budget really does end —
-                it closes out on the settlement screen — and past 62 s the minigames are stepped aside rather than
-                failed. To take over yourself, press <b>Start Journey</b>.</span
-              >
-            </li>
-            <li><span class="zh">键盘 W/A/S/D + 方向键，触屏有虚拟摇杆；空格是对话键。</span><span class="en">Keyboard W/A/S/D and arrows, touch stick on mobile; space advances dialogue.</span></li>
-            <li><span class="zh">中英双语完整（各 415 条文案，键集合由回归钉住）。</span><span class="en">Fully bilingual — 415 strings per language, key parity held by the regression.</span></li>
-            <li><span class="zh">需要 WebGL 2；浏览器若拦截自动播放，点一下画面即可。</span><span class="en">Needs WebGL 2; if the browser blocks autoplay, click once.</span></li>
-          </ul>
-
-          <p class="alt-links">
-            <a href="#download"><span class="zh">改用桌面安装包</span><span class="en">Use the desktop installer instead</span></a>
-          </p>
-        </article>
-
-        <!-- ---------- 03 下载 ---------- -->
-        <article class="card" id="download">
-          <header class="card-head">
-            <span class="num">03</span>
-            <div>
-              <h3><span class="zh">下载</span><span class="en">Download</span></h3>
-              <p class="card-sub">
-                <span class="zh">源码 · 本地运行 · 可分发产物</span>
-                <span class="en">Source · run it locally · distributable build</span>
-              </p>
-            </div>
-          </header>
-
-          <ol class="dl">
-            <li class="dl-row">
-              <span class="dl-label"
-                ><span class="zh">桌面版安装包</span><span class="en">Desktop installers</span></span
-              >
-              <a class="btn btn-small" data-cfg="releaseUrl" href="https://github.com/Jasper-Leung/188js/releases/latest"
-                ><span class="zh">前往下载</span><span class="en">Download</span></a
-              >
-              <span class="dl-hint"
-                ><span class="zh"
-                  >Windows / macOS / Linux 三个平台，在 Release 页面挑自己那个；装完是独立运行的桌面版</span
-                ><span class="en"
-                  >Windows / macOS / Linux — pick yours on the Releases page; it runs standalone</span
-                ></span
-              >
-            </li>
-
-            <li class="dl-row">
-              <span class="dl-label"><span class="zh">源码（完整仓库，main 分支）</span><span class="en">Source (full repo, main)</span></span>
-              <a class="btn btn-small" data-cfg="sourceZipUrl" href="https://github.com/Jasper-Leung/188js/archive/refs/heads/main.zip"
-                ><span class="zh">下载 zip</span><span class="en">Download zip</span></a
-              >
-              <a class="link" data-cfg="repoUrl" href="https://github.com/Jasper-Leung/188js"
-                ><span class="zh">仓库</span><span class="en">Repository</span></a
-              >
-              <span class="dl-hint"
-                ><span class="zh"
-                  >约 4 MB，不含 node_modules 与 dist；下面两步就能自己跑起来</span
-                ><span class="en"
-                  >~4 MB, no node_modules or dist — two commands below and it runs</span
-                ></span
-              >
-            </li>
-
-            <li class="dl-row">
-              <span class="dl-label"><span class="zh">本地运行（三步，Node 20+）</span><span class="en">Run locally (3 steps, Node 20+)</span></span>
-              <p class="url-row url-row-wide">
-                <code id="run-command"  data-cfg="runCommand">npm ci &amp;&amp; npm run build &amp;&amp; npm run preview</code>
-                <button class="copy" type="button" data-copy="#run-command">
-                  <span class="zh">复制</span><span class="en">Copy</span>
-                </button>
-              </p>
-              <span class="dl-hint"
-                ><span class="zh"
-                  >typecheck + 无头回归是上线的门，构建前置；<code>npm run dev</code> 是开发服务器</span
-                ><span class="en"
-                  >typecheck and the headless regression gate the build; <code>npm run dev</code> starts the dev server</span
-                ></span
-              >
-            </li>
-
-            <li class="dl-row">
-              <span class="dl-label"
-                ><span class="zh">自己打一个可分发包</span><span class="en">Make a distributable build</span></span
-              >
-              <p class="url-row url-row-wide">
-                <code id="package-command"  data-cfg="packageCommand">npm run package:web</code>
-                <button class="copy" type="button" data-copy="#package-command">
-                  <span class="zh">复制</span><span class="en">Copy</span>
-                </button>
-              </p>
-              <span class="dl-hint"
-                ><span class="zh">产物落在 <code>release/</code>，可挂到 GitHub Release 上当下载链接</span
-                ><span class="en">lands in <code>release/</code> — attach it to a GitHub Release</span></span
-              >
-            </li>
-          </ol>
-        </article>
+            <ul class="stats">
+              <li>
+                <b>1,228.8<small>m</small></b
+                ><span class="zh">环线长 · 961 个中线点</span><span class="en">loop · 961 centreline points</span>
+              </li>
+              <li><b>16</b><span class="zh">座路边驿站</span><span class="en">roadside stations</span></li>
+              <li><b>15</b><span class="zh">枚碎片 → 一张明信片</span><span class="en">fragments → one postcard</span></li>
+              <li>
+                <b>20–30<small>min</small></b
+                ><span class="zh">分钟一程</span><span class="en">minutes a run</span>
+              </li>
+            </ul>
+          </div>
+        </div>
       </section>
 
-      <!-- ==================== 作品说明 ==================== -->
-      <section id="about" class="section">
-        <h2 class="section-title">
-          <span class="zh">这是什么</span><span class="en">What it is</span>
-        </h2>
+      <!-- ==================== 贰 · 三件交付物 ==================== -->
+      <section id="deliverables" class="section section-deliv">
+        <div class="wrap">
+          <header class="chapter">
+            <p class="chapter-rule" aria-hidden="true"><span>No. 02 — Deliverables</span><span>02 / 06</span></p>
+            <div class="chapter-grid">
+              <p class="chapter-num" aria-hidden="true">贰</p>
+              <div class="chapter-body">
+                <h2 class="chapter-title"><span class="zh">三件交付物</span><span class="en">Three deliverables</span></h2>
+                <p class="chapter-orn" aria-hidden="true"><span class="zh">Three deliverables</span><span class="en">三件交付物</span></p>
+                <p class="lede">
+                  <span class="zh"
+                    >录屏、在线 Demo、下载入口都在这一页上。免注册、免登录、不需要装任何东西。网页版有两个镜像，任选一个都能玩；嫌加载慢就直接装桌面版。</span
+                  ><span class="en"
+                    >Recording, live demo and downloads all live on this page. No sign-up, nothing to install.
+                    The web build is mirrored in two places — either one works; if loading feels slow, take the desktop build.</span
+                  >
+                </p>
+              </div>
+            </div>
+          </header>
 
-        <div class="prose">
-          <p>
-            <span class="zh"
-              >路俊航靠修旧物为生。六年前母亲在这条路上失踪，只留下一间空的第十八驿站。一封律师函给了三十天：
-              开张，否则土地被依法收回——而山下有人想要那口温泉。</span
-            ><span class="en"
-              >Miles Lu repairs broken things for a living. His mother disappeared on this road six years ago and left
-              him the family business: the Eighteenth Station inn, empty ever since. Then a lawyer's letter gives him
-              thirty days to open it, or the land is taken by law — and someone would like what sits under the hot
-              spring.</span
-            >
-          </p>
-          <p>
-            <span class="zh"
-              >路上不空。<b>守碑人记得这条路，不记得自己；你替所有人留着回家的路，代价是没人记得你。</b>
-              沿途四块碑这么写着，其中一块的字被凿掉了，只剩「半個 188」。</span
-            ><span class="en"
-              >The road is not empty. <b>The keeper remembers the road, not himself. You keep the way home for everyone —
-              the price is that no one remembers you.</b> Four chiselled steles say so along the way; one has had its
-              letters scraped off, leaving half a 188.</span
-            >
-          </p>
-          <p>
-            <span class="zh"
-              >碎片之间散着五件乐事——云、茶、琴、竹、禽，每样都要来三次才肯给点什么。没有战斗，没有失败状态，没有过场动画：
-              每一句对白都在车还在动的时候到来。最后，十五枚碎片被压成一张明信片，你可以手写、导出 PNG，或者留白；
-              然后在「留下那扇门」和「放手」之间选一个。</span
-            ><span class="en"
-              >Between them are five small joys — cloud, tea, zither, bamboo, bird — each wanting three visits before it
-              gives anything up. No combat. No fail state. No cutscene: every line arrives while the bicycle is still
-              moving. At the end the fifteen fragments you collected are pressed into a postcard you can write on and
-              export as a PNG — or leave blank — and then choose between <b>Leave the Door</b> and <b>Let Go</b>.</span
-            >
+          <!-- 目录：评委的时间很短，三秒内要能指到三件东西 -->
+          <ol class="toc">
+            <li>
+              <a href="#video">
+                <span class="toc-num">01</span>
+                <span class="toc-name"><span class="zh">演示录屏视频</span><span class="en">Demo recording</span></span>
+                <span class="toc-meta"><span class="zh">1:49 · 英配 · 字幕已烧录</span><span class="en">1:49 · English VO · burned-in subs</span></span>
+                <span class="toc-go" aria-hidden="true"><svg class="i" viewBox="0 0 24 24"><path d="M12 5v14M6 13l6 6 6-6" /></svg></span>
+              </a>
+            </li>
+            <li>
+              <a href="#demo">
+                <span class="toc-num">02</span>
+                <span class="toc-name"><span class="zh">在线 Demo</span><span class="en">Live demo</span></span>
+                <span class="toc-meta"><span class="zh">浏览器直接运行 · 两个镜像</span><span class="en">In the browser · two mirrors</span></span>
+                <span class="toc-go" aria-hidden="true"><svg class="i" viewBox="0 0 24 24"><path d="M12 5v14M6 13l6 6 6-6" /></svg></span>
+              </a>
+            </li>
+            <li>
+              <a href="#download">
+                <span class="toc-num">03</span>
+                <span class="toc-name"><span class="zh">下载</span><span class="en">Download</span></span>
+                <span class="toc-meta"><span class="zh">Windows / macOS / Linux · 源码</span><span class="en">Windows / macOS / Linux · source</span></span>
+                <span class="toc-go" aria-hidden="true"><svg class="i" viewBox="0 0 24 24"><path d="M12 5v14M6 13l6 6 6-6" /></svg></span>
+              </a>
+            </li>
+          </ol>
+        </div>
+
+        <!-- ---------- 01 录屏 ---------- -->
+        <!-- 放映厅：整条深色。录屏是这一页上唯一的实机画面，给它最大的版面 -->
+        <article class="screening" id="video">
+          <div class="wrap">
+            <header class="reel-head">
+              <p class="slate" aria-hidden="true"><span>Reel 01</span><span>Gameplay · unedited</span></p>
+              <div class="reel-title">
+                <span class="num">01</span>
+                <div>
+                  <h3><span class="zh">演示录屏视频</span><span class="en">Demo screen recording</span></h3>
+                  <p class="deliv-sub">
+                    <span class="zh">本机实机录制 · 真实按键 · 非生成画面</span>
+                    <span class="en">Captured on the real build with real keystrokes — not generated</span>
+                  </p>
+                </div>
+              </div>
+              <p class="deliv-actions alt-links">
+                <a class="btn btn-ondark btn-sm" data-cfg="videoSrc" href="media/demo.mp4" download>
+                  <svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v11M7 10l5 5 5-5M5 20h14" /></svg>
+                  <span class="zh">下载 mp4</span><span class="en">Download mp4</span>
+                </a>
+                <a class="btn btn-ondark btn-sm" data-cfg="videoSrc" href="media/demo.mp4" target="_blank" rel="noopener">
+                  <span class="zh">新窗口打开</span><span class="en">Open in a new tab</span>
+                  <svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 16 17 7M9 7h8v8" /></svg>
+                </a>
+              </p>
+            </header>
+
+            <!-- 四角的朱色裁切标：取景框，不是装饰边 -->
+            <figure class="video-frame">
+              <span class="crop crop-tl" aria-hidden="true"></span><span class="crop crop-tr" aria-hidden="true"></span>
+              <span class="crop crop-bl" aria-hidden="true"></span><span class="crop crop-br" aria-hidden="true"></span>
+              <div class="video-box">
+                <video
+                  id="demo-video"
+                  controls
+                  playsinline
+                  preload="metadata"
+                  poster="media/poster.jpg"
+                  data-cfg="videoPoster"
+                  aria-label="Gift No.188 演示录屏 / demo screen recording"
+                >
+                  <source src="media/demo.mp4" data-cfg="videoSrc" type="video/mp4" />
+                  <span class="zh"
+                    >你的浏览器不放内嵌视频，<a data-cfg="videoSrc" href="media/demo.mp4">点这里下载 mp4</a>。<a data-cfg="videoSrc" href="media/demo.mp4" target="_blank" rel="noopener">或在新窗口打开</a>。</span
+                  ><span class="en"
+                    >Your browser will not play this inline —
+                    <a data-cfg="videoSrc" href="media/demo.mp4">download the mp4</a>
+                    <a data-cfg="videoSrc" href="media/demo.mp4" target="_blank" rel="noopener">or open it in a new tab</a>.</span
+                  >
+                </video>
+              </div>
+            </figure>
+
+            <!--
+              素材没跟这次构建走时（tools/build-submission.mjs 会在 <html> 上挂
+              data-missing="video"），播放器被收起、换成下面这句说明。
+              给评委一个点了没反应的播放器，比坦白说「这里没有视频」糟糕得多。
+            -->
+            <p class="media-note">
+              <span class="zh"
+                >这次构建没有把录屏文件带上（多半是跑了 <code>--no-media</code>）。母版在仓库的
+                <code>promo/footage/07-walkthrough-vo-web.mp4</code>。</span
+              ><span class="en"
+                >This build shipped without the recording bundled. The master is at
+                <code>promo/footage/07-walkthrough-vo-web.mp4</code>.</span
+              >
+            </p>
+
+            <!-- 场记板式的参数条 -->
+            <dl class="slate-strip card-meta">
+              <div><dt><span class="zh">实录</span><span class="en">Recorded</span></dt><dd>1920×1080</dd></div>
+              <div><dt><span class="zh">网页版</span><span class="en">Web</span></dt><dd>1280×720 / 30fps</dd></div>
+              <div><dt><span class="zh">时长</span><span class="en">Length</span></dt><dd data-cfg="videoDuration">1:49</dd></div>
+              <div><dt><span class="zh">大小</span><span class="en">Size</span></dt><dd data-cfg="videoSize">21.76 MB</dd></div>
+              <div><dt><span class="zh">播放</span><span class="en">Playback</span></dt><dd><span class="zh">直链播放，无需登录</span><span class="en">direct link, no login</span></dd></div>
+            </dl>
+
+            <ol class="notes notes-grid">
+              <li>
+                <span class="zh"
+                  >1 分 49 秒一镜到底：标题页 → 引导页 → 进世界 → 序章 → 上路 → 骑完整整一圈 1228.8 m → 花房·禽语湖湾打卡 → 小游戏 → 退出面板 → 回到起点。</span
+                ><span class="en"
+                  >1:49, one continuous session: title → tutorial → world → prologue → on the road →
+                  the full 1228.8 m lap → a fragment station → a minigame → back to the start.</span
+                >
+              </li>
+              <li>
+                <span class="zh"
+                  >真人操作链路：点按钮、按方向键、走游戏自己的相机。没有导轨机位，也没有后期生成的画面。</span
+                ><span class="en"
+                  >A real session — actual button clicks, real keypresses, the game's own camera.
+                  No dolly rigs, no generated shots.</span
+                >
+              </li>
+              <li>
+                <span class="zh"
+                  >英配解说（20 句旁白），<b>字幕已烧进画面</b>——静音也看得懂，不开声音不损失任何一句。</span
+                ><span class="en"
+                  >English narration (20 cues) with the subtitles <b>burned into the picture</b> — watch it on mute and
+                  you lose no line.</span
+                >
+              </li>
+              <li>
+                <span class="zh">它骑的是自行车、只打了 1/5 块碎片——这是一次真实的通关尝试，不是宣传片。</span
+                ><span class="en"
+                  >It rides the bicycle the whole way and collects one fragment of five — a real playthrough
+                  attempt, not a promo cut.</span
+                >
+              </li>
+            </ol>
+          </div>
+        </article>
+
+        <div class="wrap">
+          <!-- ---------- 02 在线 Demo ---------- -->
+          <!--
+            两个镜像。GitHub Pages 放前面是有原因的：workers.dev 在部分网络（尤其大陆）
+            会被 DNS 劫持，实测连不上，而评委多半就在那样的网络里。主按钮给能打开的那个。
+          -->
+          <article class="deliv" id="demo">
+            <div class="deliv-side">
+              <header class="deliv-head">
+                <span class="num">02</span>
+                <div>
+                  <h3><span class="zh">在线 Demo</span><span class="en">Live demo</span></h3>
+                  <p class="deliv-sub">
+                    <span class="zh">浏览器直接运行 · 点开即玩 · 两个镜像任选其一</span>
+                    <span class="en">Runs in the browser · nothing to install · two mirrors, pick either</span>
+                  </p>
+                </div>
+              </header>
+
+              <!-- 主镜像做成一整块可点的「票」：最大的那个目标给最该点的那个链接 -->
+              <div class="ticket">
+                <a
+                  class="ticket-main"
+                  data-cfg="demoUrl"
+                  href="https://jasper-leung.github.io/188js/?"
+                  target="_blank"
+                  rel="noopener"
+                >
+                  <span class="ticket-tag"><span class="zh">主镜像</span><span class="en">Primary</span> · GitHub Pages</span>
+                  <span class="ticket-cta"><span class="zh">打开在线 Demo</span><span class="en">Open the live demo</span></span>
+                  <span class="ticket-arrow" aria-hidden="true"
+                    ><svg class="i" viewBox="0 0 24 24"><path d="M7 17 17 7M9 7h8v8" /></svg
+                  ></span>
+                </a>
+                <p class="url-row">
+                  <code id="demo-url-gh" data-cfg="demoUrl">https://jasper-leung.github.io/188js/?</code>
+                  <button class="copy" type="button" data-copy="#demo-url-gh">
+                    <span class="copy-idle"><span class="zh">复制</span><span class="en">Copy</span></span
+                    ><span class="copy-done"><span class="zh">已复制</span><span class="en">Copied</span></span>
+                  </button>
+                </p>
+              </div>
+
+              <div class="mirror">
+                <a
+                  class="mirror-link"
+                  data-cfg="demoUrlAlt"
+                  href="https://gift-no188.jasperaptx4868.workers.dev/"
+                  target="_blank"
+                  rel="noopener"
+                >
+                  <span class="mirror-tag"><span class="zh">备用</span><span class="en">Backup</span> · Cloudflare</span>
+                  <span class="mirror-name"><span class="zh">备用镜像</span><span class="en">Backup mirror</span></span>
+                  <svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8" /></svg>
+                </a>
+                <p class="url-row">
+                  <code id="demo-url-cf" data-cfg="demoUrlAlt">https://gift-no188.jasperaptx4868.workers.dev/</code>
+                  <button class="copy" type="button" data-copy="#demo-url-cf">
+                    <span class="copy-idle"><span class="zh">复制</span><span class="en">Copy</span></span
+                    ><span class="copy-done"><span class="zh">已复制</span><span class="en">Copied</span></span>
+                  </button>
+                </p>
+                <p class="notes-hint">
+                  <span class="zh">备用镜像（Cloudflare）在部分网络下打不开——workers.dev 常被 DNS 拦掉，打不开就用上面那个。</span
+                  ><span class="en"
+                    >The Cloudflare mirror is unreachable on some networks — <code>workers.dev</code> is often DNS-blocked. If it
+                    doesn't open, use the first one.</span
+                  >
+                </p>
+              </div>
+
+              <p class="alt-links">
+                <a href="#download"><span class="zh">改用桌面安装包</span><span class="en">Use the desktop installer instead</span> →</a>
+              </p>
+            </div>
+
+            <ol class="notes deliv-notes">
+              <li>
+                <span class="zh"
+                  ><b>模型要现下，网页版起步慢。</b>三个资源加起来约 21 MB，其中模型占 16.84 MB（81%）；网络一般时，进度条会在模型上停挺久。介意的话装桌面版——同一份内容，装完本地加载，打开就是进世界，没有下载过程。</span
+                ><span class="en"
+                  ><b>Models are fetched on the spot, so the web build starts slowly.</b> The payload is ~21 MB, of
+                  which models are 16.84 MB (81%); on a middling connection the progress bar sits there for a while.
+                  If that bothers you, take the desktop installer — the same content, loaded locally, straight into the
+                  world with nothing to download.</span
+                >
+              </li>
+              <!--
+                这一条不是免责声明，是实机行为。摩托车 4.82 MB，被故意挂在启动链**外面**单跑
+                （world.ts: `loadMotorcycleModel` 不并进 `loadVehicleExtras`），
+                而 `Vehicle.canEnter()` 在模型到位前恒为假——所以 E 只会跳过还没到的车，
+                不会把你切进一辆看不见的车。
+
+                **自动上车那一半不是「可以」，是「已经」**（main.ts 的 P1-6 落点）：
+                自行车模型到位时，如果 `vehicleTouched` 还是假（玩家没按过 E），游戏会
+                直接 `vehicle.set('bike')`。所以默认的起手状态就是骑车——录屏里那条
+                自行车（顶速 15 m/s，而徒步上限 6 m/s）就是这么来的。
+                写这段时如果只讲「按 E 切换」，就漏掉了不按键的人默认看到什么。
+              -->
+              <li>
+                <span class="zh"
+                  ><b>开局直接给你一辆自行车。</b>三种车分批现下：2.79 MB 的自行车跟着启动链走，4.82 MB 的摩托车则被单独挂在链外单跑，免得它拖住整批。所以<b>自行车模型一落地，只要你自己没按过 <code>E</code>，游戏就先把人放上车</b>——这是「开局不要走路」那条决定的落点。等进度条把剩下的模型跑完，<code>E</code> 才会把摩托车和滑板一起串进来。模型没到位的车会被直接跳过，不会切到一个看不见的车。</span
+                ><span class="en"
+                  ><b>You start on the bicycle.</b> The three rides load in separate batches: the 2.79 MB bicycle rides the
+                  boot chain, while the 4.82 MB motorcycle is deliberately kept outside it so it can't hold up the whole
+                  batch. So the moment the bicycle model lands — <b>as long as you haven't touched <code>E</code> yet — the
+                  game puts you on it</b> rather than opening a game about cycling with a walk. Once the progress bar has
+                  pulled in the rest, <code>E</code> picks up the motorcycle and skateboard too. Rides whose models haven't
+                  landed are skipped outright rather than switched into empty air.</span
+                >
+              </li>
+              <li><span class="zh">首屏 3.45 MB，之后按需加载；弱机走最低档也能跑。</span><span class="en">3.45 MB to first playable frame, then on demand — the low tier holds up on weak hardware.</span></li>
+              <!--
+                标题页那两颗按钮不是摆设：第二颗是「演示 · 90 秒」，替评审自己骑一遍，
+                不用碰键盘。这是给「只想看三十秒、不打算玩」的人准备的口子，
+                所以把它写进正文，而不是留在录屏里一带而过。
+              -->
+              <li>
+                <span class="zh"
+                  ><b>不想动手也有得看。</b>标题页第二颗按钮是「演示 · 90 秒」——车自己往前骑，你的手不用碰键盘。九十秒预算到点会自己收场进结算页（所以它真的会结束）；第 62 秒之后不再玩小游戏，到站直接记一次拜访，不判你输。想自己开，就点左边那颗「开启旅程」。</span
+                ><span class="en"
+                  ><b>You don't have to drive to see it.</b> The second button on the title screen is
+                  <b>Demo · 90s</b>: the bike rides itself, no keys required. The 90-second budget really does end —
+                  it closes out on the settlement screen — and past 62 s the minigames are stepped aside rather than
+                  failed. To take over yourself, press <b>Start Journey</b>.</span
+                >
+              </li>
+              <li><span class="zh">键盘 W/A/S/D + 方向键，触屏有虚拟摇杆；空格是对话键。</span><span class="en">Keyboard W/A/S/D and arrows, touch stick on mobile; space advances dialogue.</span></li>
+              <li><span class="zh">中英双语完整（各 415 条文案，键集合由回归钉住）。</span><span class="en">Fully bilingual — 415 strings per language, key parity held by the regression.</span></li>
+              <li><span class="zh">需要 WebGL 2；浏览器若拦截自动播放，点一下画面即可。</span><span class="en">Needs WebGL 2; if the browser blocks autoplay, click once.</span></li>
+            </ol>
+          </article>
+
+          <!-- ---------- 03 下载 ---------- -->
+          <article class="deliv deliv-dl" id="download">
+            <header class="deliv-head">
+              <span class="num">03</span>
+              <div>
+                <h3><span class="zh">下载</span><span class="en">Download</span></h3>
+                <p class="deliv-sub">
+                  <span class="zh">源码 · 本地运行 · 可分发产物</span>
+                  <span class="en">Source · run it locally · distributable build</span>
+                </p>
+              </div>
+            </header>
+
+            <ol class="dl">
+              <li class="dl-row dl-feature">
+                <span class="dl-text">
+                  <span class="dl-label"><span class="zh">桌面版安装包</span><span class="en">Desktop installers</span></span>
+                  <span class="dl-platforms" aria-hidden="true"><i>Windows</i><i>macOS</i><i>Linux</i></span>
+                  <span class="dl-hint"
+                    ><span class="zh">Windows / macOS / Linux 三个平台，在 Release 页面挑自己那个；装完是独立运行的桌面版</span
+                    ><span class="en">Windows / macOS / Linux — pick yours on the Releases page; it runs standalone</span></span
+                  >
+                </span>
+                <span class="dl-actions">
+                  <a class="btn btn-primary btn-lg" data-cfg="releaseUrl" href="https://github.com/Jasper-Leung/188js/releases/latest"
+                    ><span class="zh">前往下载</span><span class="en">Download</span>
+                    <span class="btn-arrow" aria-hidden="true"
+                      ><svg class="i" viewBox="0 0 24 24"><path d="M12 4v11M7 10l5 5 5-5M5 20h14" /></svg></span
+                  ></a>
+                </span>
+              </li>
+
+              <li class="dl-row">
+                <span class="dl-idx" aria-hidden="true">a</span>
+                <span class="dl-text">
+                  <span class="dl-label"><span class="zh">源码（完整仓库，main 分支）</span><span class="en">Source (full repo, main)</span></span>
+                  <span class="dl-hint"
+                    ><span class="zh">约 4 MB，不含 node_modules 与 dist；下面两步就能自己跑起来</span
+                    ><span class="en">~4 MB, no node_modules or dist — two commands below and it runs</span></span
+                  >
+                </span>
+                <span class="dl-actions">
+                  <a class="btn" data-cfg="sourceZipUrl" href="https://github.com/Jasper-Leung/188js/archive/refs/heads/main.zip"
+                    ><span class="zh">下载 zip</span><span class="en">Download zip</span></a
+                  >
+                  <a class="btn btn-quiet" data-cfg="repoUrl" href="https://github.com/Jasper-Leung/188js"
+                    ><span class="zh">仓库</span><span class="en">Repository</span></a
+                  >
+                </span>
+              </li>
+
+              <li class="dl-row">
+                <span class="dl-idx" aria-hidden="true">b</span>
+                <span class="dl-text">
+                  <span class="dl-label"><span class="zh">本地运行（三步，Node 20+）</span><span class="en">Run locally (3 steps, Node 20+)</span></span>
+                  <span class="dl-hint"
+                    ><span class="zh">typecheck + 无头回归是上线的门，构建前置；<code>npm run dev</code> 是开发服务器</span
+                    ><span class="en">typecheck and the headless regression gate the build; <code>npm run dev</code> starts the dev server</span></span
+                  >
+                </span>
+                <p class="url-row url-row-wide term">
+                  <code id="run-command" data-cfg="runCommand">npm ci &amp;&amp; npm run build &amp;&amp; npm run preview</code>
+                  <button class="copy" type="button" data-copy="#run-command">
+                    <span class="copy-idle"><span class="zh">复制</span><span class="en">Copy</span></span
+                    ><span class="copy-done"><span class="zh">已复制</span><span class="en">Copied</span></span>
+                  </button>
+                </p>
+              </li>
+
+              <li class="dl-row">
+                <span class="dl-idx" aria-hidden="true">c</span>
+                <span class="dl-text">
+                  <span class="dl-label"><span class="zh">自己打一个可分发包</span><span class="en">Make a distributable build</span></span>
+                  <span class="dl-hint"
+                    ><span class="zh">产物落在 <code>release/</code>，可挂到 GitHub Release 上当下载链接</span
+                    ><span class="en">lands in <code>release/</code> — attach it to a GitHub Release</span></span
+                  >
+                </span>
+                <p class="url-row url-row-wide term">
+                  <code id="package-command" data-cfg="packageCommand">npm run package:web</code>
+                  <button class="copy" type="button" data-copy="#package-command">
+                    <span class="copy-idle"><span class="zh">复制</span><span class="en">Copy</span></span
+                    ><span class="copy-done"><span class="zh">已复制</span><span class="en">Copied</span></span>
+                  </button>
+                </p>
+              </li>
+            </ol>
+          </article>
+        </div>
+      </section>
+
+      <!-- ==================== 叁 · 作品说明 ==================== -->
+      <section id="about" class="section section-story">
+        <div class="wrap">
+          <header class="chapter">
+            <p class="chapter-rule" aria-hidden="true"><span>No. 03 — The Story</span><span>03 / 06</span></p>
+            <div class="chapter-grid">
+              <p class="chapter-num" aria-hidden="true">叁</p>
+              <div class="chapter-body">
+                <h2 class="chapter-title"><span class="zh">这是什么</span><span class="en">What it is</span></h2>
+                <p class="chapter-orn" aria-hidden="true"><span class="zh">What it is</span><span class="en">这是什么</span></p>
+              </div>
+            </div>
+          </header>
+
+          <div class="story-grid">
+            <div class="prose">
+              <p class="dropcap">
+                <span class="zh"
+                  >路俊航靠修旧物为生。六年前母亲在这条路上失踪，只留下一间空的第十八驿站。一封律师函给了三十天：开张，否则土地被依法收回——而山下有人想要那口温泉。</span
+                ><span class="en"
+                  >Miles Lu repairs broken things for a living. His mother disappeared on this road six years ago and left
+                  him the family business: the Eighteenth Station inn, empty ever since. Then a lawyer's letter gives him
+                  thirty days to open it, or the land is taken by law — and someone would like what sits under the hot
+                  spring.</span
+                >
+              </p>
+              <p>
+                <span class="zh"
+                  >路上不空。<b>守碑人记得这条路，不记得自己；你替所有人留着回家的路，代价是没人记得你。</b>沿途四块碑这么写着，其中一块的字被凿掉了，只剩「半個 188」。</span
+                ><span class="en"
+                  >The road is not empty. <b>The keeper remembers the road, not himself. You keep the way home for everyone —
+                  the price is that no one remembers you.</b> Four chiselled steles say so along the way; one has had its
+                  letters scraped off, leaving half a 188.</span
+                >
+              </p>
+              <p>
+                <span class="zh"
+                  >碎片之间散着五件乐事——云、茶、琴、竹、禽，每样都要来三次才肯给点什么。没有战斗，没有失败状态，没有过场动画：每一句对白都在车还在动的时候到来。最后，十五枚碎片被压成一张明信片，你可以手写、导出 PNG，或者留白；然后在「留下那扇门」和「放手」之间选一个。</span
+                ><span class="en"
+                  >Between them are five small joys — cloud, tea, zither, bamboo, bird — each wanting three visits before it
+                  gives anything up. No combat. No fail state. No cutscene: every line arrives while the bicycle is still
+                  moving. At the end the fifteen fragments you collected are pressed into a postcard you can write on and
+                  export as a PNG — or leave blank — and then choose between <b>Leave the Door</b> and <b>Let Go</b>.</span
+                >
+              </p>
+            </div>
+
+            <!-- 碑：正文第二段那句话的版面化。中文竖排，英文横排 -->
+            <aside class="stele" aria-hidden="true">
+              <span class="stele-cap"></span>
+              <p class="stele-text">
+                <span class="zh">你替所有人<br />留着回家的路</span
+                ><span class="en">You keep the way home for everyone.</span>
+              </p>
+              <p class="stele-foot"><span class="zh">沿途碑文</span><span class="en">A stele on the road</span></p>
+            </aside>
+          </div>
+
+          <!-- 五件乐事：每样三次，合起来就是那十五枚碎片。三个点就是三次 -->
+          <ul class="joys">
+            <li><b>云</b><span class="joy-en">Cloud</span><span class="joy-visits" aria-hidden="true"><i></i><i></i><i></i></span><span class="zh">三次</span><span class="en">three visits</span></li>
+            <li class="joy-tea"><b>茶</b><span class="joy-en">Tea</span><span class="joy-visits" aria-hidden="true"><i></i><i></i><i></i></span><span class="zh">三次</span><span class="en">three visits</span></li>
+            <li><b>琴</b><span class="joy-en">Zither</span><span class="joy-visits" aria-hidden="true"><i></i><i></i><i></i></span><span class="zh">三次</span><span class="en">three visits</span></li>
+            <li><b>竹</b><span class="joy-en">Bamboo</span><span class="joy-visits" aria-hidden="true"><i></i><i></i><i></i></span><span class="zh">三次</span><span class="en">three visits</span></li>
+            <li><b>禽</b><span class="joy-en">Bird</span><span class="joy-visits" aria-hidden="true"><i></i><i></i><i></i></span><span class="zh">三次</span><span class="en">three visits</span></li>
+          </ul>
+          <p class="joys-sum">
+            <span class="zh">5 件乐事 × 3 次 = 15 枚碎片 → 1 张明信片 → 「留下那扇门」或「放手」</span
+            ><span class="en">5 joys × 3 visits = 15 fragments → 1 postcard → Leave the Door, or Let Go</span>
           </p>
         </div>
       </section>
 
-      <!-- ==================== 宣传物料 ==================== -->
+      <!-- ==================== 肆 · 宣传物料 ==================== -->
       <!--
         这一段是**宣传物料**，不是游戏画面：一支氛围片加三张静帧，都由 TapNow 生成。
 
         为什么必须自己说清楚是生成的：上面 01 号卡片特地写了「真实按键 · 非生成画面」，
         录屏的可信度整个架在那句话上。生成的画面如果含糊地摆在旁边，读者会默认它也是实录，
         那句话就当场作废。所以这里既不藏在角落，也不蹭那份可信——单开一节，标题、图注、
-        正文各标一次，用深底相框和纸色卡片在形状上也分开。
+        正文各标一次，每一帧画面左上角还压着一枚「AI 生成」的角标。
 
         位置放在「这是什么」之后：上一节刚讲完五件乐事（云、茶、琴、竹、禽），
         这一节就拍的是其中的「茶」，接得住。
       -->
-      <section id="promo" class="section">
-        <h2 class="section-title">
-          <span class="zh">宣传物料</span><span class="en">Promotional material</span>
-        </h2>
-        <p class="lede">
-          <span class="zh"
-            >清晨的光，一杯放下的茶——为「茶」这一乐事拍的一支氛围片，配三张静帧。
-            <b>这些是 AI 生成的画面（TapNow），不是游戏实录</b>；游戏本身长什么样，看上面 01 号那张录屏。</span
-          ><span class="en"
-            >Morning light and a cup set down — a mood film for the tea joy, with three stills.
-            <b>These frames are AI-generated (TapNow), not gameplay</b>; for what the game actually looks like,
-            watch the recording in card 01 above.</span
-          >
-        </p>
+      <section id="promo" class="section section-promo">
+        <div class="wrap">
+          <header class="chapter">
+            <p class="chapter-rule" aria-hidden="true"><span>No. 04 — Promotional · AI-generated</span><span>04 / 06</span></p>
+            <div class="chapter-grid">
+              <p class="chapter-num" aria-hidden="true">肆</p>
+              <div class="chapter-body">
+                <h2 class="chapter-title"><span class="zh">宣传物料</span><span class="en">Promotional material</span></h2>
+                <p class="chapter-orn" aria-hidden="true"><span class="zh">Morning, tea</span><span class="en">清晨 · 茶</span></p>
+                <p class="lede">
+                  <span class="zh"
+                    >清晨的光，一杯放下的茶——为「茶」这一乐事拍的一支氛围片，配三张静帧。<b>这些是 AI 生成的画面（TapNow），不是游戏实录</b>；游戏本身长什么样，看上面 01 号那张录屏。</span
+                  ><span class="en"
+                    >Morning light and a cup set down — a mood film for the tea joy, with three stills.
+                    <b>These frames are AI-generated (TapNow), not gameplay</b>; for what the game actually looks like,
+                    watch the recording in card 01 above.</span
+                  >
+                </p>
+              </div>
+            </div>
+          </header>
 
-        <figure class="promo">
-          <!-- 相框（aspect-ratio + overflow:hidden）只包住 video，图注留在框**外面**。
-               图注要是放进框里，就会被那条 aspect-ratio 连同 overflow 一起裁掉。 -->
-          <div class="promo-frame">
-            <video
-              id="promo-video"
-              autoplay
-              muted
-              loop
-              playsinline
-              controls
-              preload="metadata"
-              poster="media/promo-morning-poster.jpg"
-              aria-label="宣传氛围片：清晨放茶 / promo mood film: morning, tea set down"
-            >
-              <source src="media/promo-morning.mp4" type="video/mp4" />
-              <span class="zh"
-                >你的浏览器不放内嵌视频，<a href="media/promo-morning.mp4">点这里下载 mp4</a>。</span
-              ><span class="en"
-                >Your browser will not play this inline —
-                <a href="media/promo-morning.mp4">download the mp4</a>.</span
-              >
-            </video>
-          </div>
-          <figcaption class="promo-cap">
-            <span class="zh"
-              >镜头 1 · 清晨放茶 · 5.0 秒静音循环 · 864×496 · 无音轨 · AI 生成（TapNow）</span
-            ><span class="en"
-              >Shot 1 · morning, tea set down · 5.0 s silent loop · 864×496 · no audio track · AI-generated
-              (TapNow)</span
-            >
-          </figcaption>
-        </figure>
+          <div class="promo-layout">
+            <figure class="promo">
+              <!-- 相框（aspect-ratio + overflow:hidden）只包住 video，图注留在框**外面**。
+                   图注要是放进框里，就会被那条 aspect-ratio 连同 overflow 一起裁掉。 -->
+              <div class="promo-frame">
+                <video
+                  id="promo-video"
+                  autoplay
+                  muted
+                  loop
+                  playsinline
+                  controls
+                  preload="metadata"
+                  poster="media/promo-morning-poster.jpg"
+                  aria-label="宣传氛围片：清晨放茶 / promo mood film: morning, tea set down"
+                >
+                  <source src="media/promo-morning.mp4" type="video/mp4" />
+                  <span class="zh">你的浏览器不放内嵌视频，<a href="media/promo-morning.mp4">点这里下载 mp4</a>。</span
+                  ><span class="en"
+                    >Your browser will not play this inline —
+                    <a href="media/promo-morning.mp4">download the mp4</a>.</span
+                  >
+                </video>
+                <span class="ai-tag"><span class="zh">AI 生成</span><span class="en">AI-generated</span></span>
+              </div>
+              <figcaption class="promo-cap">
+                <span class="zh">镜头 1 · 清晨放茶 · 5.0 秒静音循环 · 864×496 · 无音轨 · AI 生成（TapNow）</span
+                ><span class="en"
+                  >Shot 1 · morning, tea set down · 5.0 s silent loop · 864×496 · no audio track · AI-generated
+                  (TapNow)</span
+                >
+              </figcaption>
+            </figure>
 
-        <div class="promo-stills">
-          <figure>
-            <img
-              src="media/promo-still-two-cups.jpg"
-              alt="清晨的客厅，两杯新茶放在矮桌上，阳光穿过窗帘。Two cups of new tea on a low table in morning light."
-              width="1280"
-              height="720"
-              loading="lazy"
-            />
-            <figcaption>
-              <span class="zh">成片 · 清晨闭环 · 两杯新茶</span>
-              <span class="en">Final · morning loop · two cups of new tea</span>
-            </figcaption>
-          </figure>
-
-          <figure>
-            <img
-              src="media/promo-style-a.jpg"
-              alt="清晨，一道光斜落在矮桌上，一只杯子冒着热气。A single cup under a beam of morning light."
-              width="1280"
-              height="720"
-              loading="lazy"
-            />
-            <figcaption>
-              <span class="zh">风格候选 A · 清晨</span>
-              <span class="en">Style candidate A · morning</span>
-            </figcaption>
-          </figure>
-
-          <figure>
-            <img
-              src="media/promo-style-c.jpg"
-              alt="黄昏，两杯茶摆在暗下来的房间里，窗外是城市的暮色。Two cups in a dim room at dusk."
-              width="1280"
-              height="720"
-              loading="lazy"
-            />
-            <figcaption>
-              <span class="zh">风格候选 C · 两杯茶（未采用）</span>
-              <span class="en">Style candidate C · two cups (not used)</span>
-            </figcaption>
-          </figure>
-        </div>
-
-        <ul class="notes">
-          <li>
-            <span class="zh"
-              ><b>为什么是「茶」。</b>故事里有五件乐事——云、茶、琴、竹、禽；茶是其中最一眼看得懂的那件，
-              也最接近一间驿站真正在做的事：烧水、放下、等它凉一点。</span
-            ><span class="en"
-              ><b>Why tea.</b> The story has five small joys — cloud, tea, zither, bamboo, bird; tea is the one that
-              reads at a glance, and the closest to what an inn actually does: boil water, set it down, wait for it to
-              cool a little.</span
-            >
-          </li>
-          <li>
-            <span class="zh"
-              ><b>方向定在清晨。</b>候选里另有一版更暗的黄昏调（候选 C），最后没有采用：故事是从清晨开始的，
-              这一页本身也是纸色——黄昏那张摆在中间，像另一部片子。</span
-            ><span class="en"
-              ><b>The direction settled on morning.</b> A darker dusk grade was also explored (candidate C) and left
-              unused: the story opens in the morning and this page is paper-coloured — the dusk frame sat in the middle
-              looking like a different film.</span
-            >
-          </li>
-          <li>
-            <span class="zh"
-              >循环播放、没有声音（源文件就没有音轨）；系统开了「减少动态效果」时停在封面帧上。
-              封面帧是从片子里 <code>t=2.5s</code> 抽的；三张静帧都是 1280×720——两张候选由 TapNow 的
-              2560×1440 原件降采样而来，成片那张本来就是 1280×720。</span
-            ><span class="en"
-              >It loops silently (the source has no audio track) and holds on the poster frame when the system asks for
-              reduced motion. The poster is a frame pulled from the film at <code>t=2.5s</code>; the three stills are all
-              1280×720 — the two candidates downsampled from TapNow's 2560×1440 originals, the final one already
-              1280×720.</span
-            >
-          </li>
-        </ul>
-      </section>
-
-      <!-- ==================== 工程 ==================== -->
-      <section id="tech" class="section">
-        <h2 class="section-title">
-          <span class="zh">工程与实测</span><span class="en">Engineering &amp; measured</span>
-        </h2>
-
-        <div class="cols">
-          <div class="col">
-            <h4><span class="zh">为弱机而生</span><span class="en">Built for weak hardware</span></h4>
-            <ul class="notes">
+            <ol class="notes promo-notes">
               <li>
                 <span class="zh"
-                  >路面、地形、草皮、水面<b>不下载任何贴图文件</b>，质感全部在着色器里算——一张铺满屏幕的草片，
-                  每层就是一次全屏纹理采样，而集显恰好卡在这里。</span
+                  ><b>为什么是「茶」。</b>故事里有五件乐事——云、茶、琴、竹、禽；茶是其中最一眼看得懂的那件，也最接近一间驿站真正在做的事：烧水、放下、等它凉一点。</span
                 ><span class="en"
-                  >Road, terrain, grass and water download <b>no texture files at all</b>; their detail is computed in
-                  shaders, because a grass card filling the screen costs a full-screen fetch per layer.</span
+                  ><b>Why tea.</b> The story has five small joys — cloud, tea, zither, bamboo, bird; tea is the one that
+                  reads at a glance, and the closest to what an inn actually does: boil water, set it down, wait for it to
+                  cool a little.</span
                 >
               </li>
               <li>
                 <span class="zh"
-                  >16 座驿站落在 13 个模型位上：其中 7 个是代码生成的（屋檐、柱、基座、栏杆，每座
-                  0.01 MB，零图片字节），6 个加载真模型——5 座碎片驿站由 Tripo 生成、自带贴图，
-                  第 6 个位置本身就是一棵榕树。</span
+                  ><b>方向定在清晨。</b>候选里另有一版更暗的黄昏调（候选 C），最后没有采用：故事是从清晨开始的，这一页本身也是纸色——黄昏那张摆在中间，像另一部片子。</span
                 ><span class="en"
-                  >The 16 stations stand on 13 model slots: 7 are generated in code at 0.01 MB each with zero image
-                  bytes, and 6 load real models — the 5 fragment stations come from Tripo and do carry their own
-                  textures, and the sixth slot is a banyan tree in its own right.</span
+                  ><b>The direction settled on morning.</b> A darker dusk grade was also explored (candidate C) and left
+                  unused: the story opens in the morning and this page is paper-coloured — the dusk frame sat in the middle
+                  looking like a different film.</span
                 >
               </li>
               <li>
                 <span class="zh"
-                  >三档画质切内部分辨率 0.60× / 0.85× / 1.0×、阴影与植被距离；低档直接删草皮，把预算花在分辨率上。
-                  没有后处理——暗角是一个 DOM 覆盖层，GPU 成本为零。</span
+                  >循环播放、没有声音（源文件就没有音轨）；系统开了「减少动态效果」时停在封面帧上。封面帧是从片子里 <code>t=2.5s</code> 抽的；三张静帧都是 1280×720——两张候选由 TapNow 的 2560×1440 原件降采样而来，成片那张本来就是 1280×720。</span
                 ><span class="en"
-                  >Three tiers cut internal resolution (0.60× / 0.85× / 1.0×), shadows and vegetation range; the low tier
-                  deletes grass and spends that budget on resolution. No post-processing.</span
+                  >It loops silently (the source has no audio track) and holds on the poster frame when the system asks for
+                  reduced motion. The poster is a frame pulled from the film at <code>t=2.5s</code>; the three stills are all
+                  1280×720 — the two candidates downsampled from TapNow's 2560×1440 originals, the final one already
+                  1280×720.</span
                 >
               </li>
-            </ul>
+            </ol>
           </div>
 
-          <div class="col">
-            <h4><span class="zh">Tripo 用了在哪</span><span class="en">Where Tripo did the work</span></h4>
-            <ul class="notes">
-              <li>
-                <span class="zh"
-                  >22 个 3D 资产里 14 个来自 Tripo：摩托车的 69 个零件、自行车的 19 个、滑板的 5 个，
-                  外加 5 座碎片驿站、松树、竹丛、灌木与两栋现代建筑。</span
-                ><span class="en"
-                  >14 of 22 3D assets came out of Tripo: 69 motorcycle parts, 19 bicycle parts, 5 skateboard parts,
-                  plus 5 fragment stations, pines, bamboo, shrubs and two modern buildings.</span
-                >
-              </li>
-              <li>
-                <span class="zh"
-                  >两份车模导出时都是 <b>0 骨骼 0 动画</b>，摩托的骑手和车体还焊在同一批零件里。
-                  在 Blender 里按实测轴位重建两骨 IK、把踩踏循环烘成动画；three.js 侧再用协方差 Jacobi
-                  特征分解从几何里量出车轴，修正导出时未对齐 three 轴向的偏差（自行车车头偏 10.67°、摩托偏 26.58°）。</span
-                ><span class="en"
-                  >Both vehicles exported with <b>zero bones and zero animation</b>, the motorcycle's rider welded to
-                  the frame. Two-bone IK was rebuilt in Blender against measured axes; on the three.js side a covariance
-                  Jacobi eigendecomposition recovers the drive axis and corrects the export's axis mismatch (bicycle
-                  10.67°, motorcycle 26.58°).</span
-                >
-              </li>
-              <li>
-                <span class="zh"
-                  >自行车的曲柄轴、曲柄臂与两只踏板共 7 个零件是导出件里没有的，是在 Tripo 模型之上自己搭的传动机构。</span
-                ><span class="en"
-                  >Seven bicycle parts — crank axle, crank arms, both pedals — are not in the export at all: the
-                  drivetrain was built on top of the Tripo model.</span
-                >
-              </li>
-            </ul>
-          </div>
+          <div class="promo-stills">
+            <figure>
+              <div class="still">
+                <img
+                  src="media/promo-still-two-cups.jpg"
+                  alt="清晨的客厅，两杯新茶放在矮桌上，阳光穿过窗帘。Two cups of new tea on a low table in morning light."
+                  width="1280"
+                  height="720"
+                  loading="lazy"
+                />
+                <span class="ai-tag"><span class="zh">AI 生成</span><span class="en">AI-generated</span></span>
+              </div>
+              <figcaption>
+                <span class="zh">成片 · 清晨闭环 · 两杯新茶</span>
+                <span class="en">Final · morning loop · two cups of new tea</span>
+              </figcaption>
+            </figure>
 
-          <div class="col">
-            <h4><span class="zh">怎么保证它没坏</span><span class="en">How it is kept honest</span></h4>
-            <ul class="notes">
-              <li>
-                <span class="zh"
-                  >移植自 Godot 4.6 原型，本届比赛期间重做为 three.js r169 + TypeScript + Vite；
-                  玩法与数值 1:1 保留，双语文案在此基础上补到 415 条，表现层与工程结构重做。</span
-                ><span class="en"
-                  >The original was Godot 4.6. This build is three.js r169 + TypeScript + Vite — a full port rebuilt
-                  during the competition: gameplay and numbers kept 1:1, the bilingual strings carried over and grown
-                  to 415, the presentation layer and project structure rebuilt.</span
-                >
-              </li>
-              <li>
-                <span class="zh"
-                  >几何不变量写成无头回归：<b>60 条 / 935 条断言</b>，钉住 961 个中线点、1228.8 m、4 处交叉、
-                  16 座驿站可达、经济系统总量、水位、双语键集合一致。它是上线的门。</span
-                ><span class="en"
-                  >Geometric invariants live in a headless regression — <b>60 suites / 935 assertions</b> pinning the 961
-                  centreline points, 1228.8 m, 4 crossings, 16 reachable stations, economy totals, water level and
-                  bilingual key parity. It gates the deploy.</span
-                >
-              </li>
-              <li>
-                <span class="zh"
-                  >它抓到过真问题：一个漏掉的 <code>fmod</code> 把群山压成了一片高原，而当时所有按数量写的断言还是绿的。</span
-                ><span class="en"
-                  >It has caught real bugs: a missing <code>fmod</code> flattened the mountains into a plateau while
-                  every count-based assertion stayed green.</span
-                >
-              </li>
-            </ul>
+            <figure>
+              <div class="still">
+                <img
+                  src="media/promo-style-a.jpg"
+                  alt="清晨，一道光斜落在矮桌上，一只杯子冒着热气。A single cup under a beam of morning light."
+                  width="1280"
+                  height="720"
+                  loading="lazy"
+                />
+                <span class="ai-tag"><span class="zh">AI 生成</span><span class="en">AI-generated</span></span>
+              </div>
+              <figcaption>
+                <span class="zh">风格候选 A · 清晨</span>
+                <span class="en">Style candidate A · morning</span>
+              </figcaption>
+            </figure>
+
+            <figure class="still-unused">
+              <div class="still">
+                <img
+                  src="media/promo-style-c.jpg"
+                  alt="黄昏，两杯茶摆在暗下来的房间里，窗外是城市的暮色。Two cups in a dim room at dusk."
+                  width="1280"
+                  height="720"
+                  loading="lazy"
+                />
+                <span class="ai-tag"><span class="zh">AI 生成</span><span class="en">AI-generated</span></span>
+              </div>
+              <figcaption>
+                <span class="zh">风格候选 C · 两杯茶（未采用）</span>
+                <span class="en">Style candidate C · two cups (not used)</span>
+              </figcaption>
+            </figure>
           </div>
         </div>
-
-        <table class="facts">
-          <caption>
-            <span class="zh">本机实测（游戏本体，不含本页素材）</span>
-            <span class="en">Measured locally (game build, excluding this page's media)</span>
-          </caption>
-          <tbody>
-            <tr>
-              <th><span class="zh">游戏本体</span><span class="en">Game build</span></th>
-              <td><b>20.78 MB</b><span class="zh"> · 63 个文件</span><span class="en"> · 63 files</span></td>
-            </tr>
-            <tr>
-              <th><span class="zh">其中模型</span><span class="en">of which models</span></th>
-              <td>16.84 MB<span class="zh">（81%）</span><span class="en"> (81%)</span></td>
-            </tr>
-            <tr>
-              <th><span class="zh">首屏必下</span><span class="en">First playable frame</span></th>
-              <td><b>3.45 MB</b><span class="zh"> · JS gzip 285 KB</span><span class="en"> · 285 KB gzipped JS</span></td>
-            </tr>
-            <tr>
-              <th><span class="zh">开发规模</span><span class="en">Development</span></th>
-              <td><span class="zh">四天 · 49 笔提交 · 一人</span><span class="en">Four days · 49 commits · one person</span></td>
-            </tr>
-          </tbody>
-        </table>
-        <p class="card-meta">
-          <span class="zh"
-            >数字量自本机 <code>dist/</code>，2026-10-07。</span
-          ><span class="en"
-            >Measured from the local <code>dist/</code> on 2026-10-07.</span
-          >
-        </p>
       </section>
-      <!-- ==================== 联系开发者 ==================== -->
-      <section id="contact" class="section">
-        <h2 class="section-title">
-          <span class="zh">联系开发者</span><span class="en">Contact the developer</span>
-        </h2>
-        <p class="lede">
-          <span class="zh"
-            >《188号礼物》是一个人做的：代码、模型、动画、音乐、双语文案，全部出自同一双手。
-            <b>扫下面的码，加开发者本人的微信</b>——反馈 Bug、讨论玩法、谈合作，直接找到他，没有客服中间层。</span
-          ><span class="en"
-            >Gift No.188 is made by one person — code, models, animation, music and both languages, all the same pair
-            of hands. <b>Scan the code to add the developer on WeChat</b> — bug reports, gameplay talk or collaboration
-            reach him directly, with no support desk in between.</span
-          >
-        </p>
 
-        <!--
-          二维码是竖长的微信原图（820×1212），头像、昵称、那句「扫二维码，添加我为好友」
-          都在图里——原样摆出来最像本人手机里长出来的样子，也最不容易被怀疑是转手的图。
-          宽度锁上限、高度 auto：竖图跟着卡片走，不会被栏宽抻成横幅。
-        -->
-        <div class="qr">
-          <figure class="qr-card">
-            <img
-              src="media/wechat-qr.png"
-              alt="开发者微信二维码：扫二维码，添加我为好友。WeChat QR code of the developer — scan to add him as a friend."
-              width="820"
-              height="1212"
-              loading="lazy"
-            />
-            <figcaption>
-              <span class="zh">微信 · 开发者本人的账号</span>
-              <span class="en">WeChat · the developer himself</span>
+      <!-- ==================== 伍 · 工程 ==================== -->
+      <section id="tech" class="section section-tech">
+        <div class="wrap">
+          <header class="chapter">
+            <p class="chapter-rule" aria-hidden="true"><span>No. 05 — Engineering</span><span>05 / 06</span></p>
+            <div class="chapter-grid">
+              <p class="chapter-num" aria-hidden="true">伍</p>
+              <div class="chapter-body">
+                <h2 class="chapter-title"><span class="zh">工程与实测</span><span class="en">Engineering &amp; measured</span></h2>
+                <p class="chapter-orn" aria-hidden="true"><span class="zh">Measured, not claimed</span><span class="en">工程与实测</span></p>
+              </div>
+            </div>
+          </header>
+
+          <!-- 数字先行：四个实测数，读者扫一眼就知道这东西多重、多快、多少人做的 -->
+          <figure class="spec">
+            <dl>
+              <div>
+                <dt><span class="zh">游戏本体</span><span class="en">Game build</span></dt>
+                <dd><b>20.78<small>MB</small></b><span class="zh">63 个文件</span><span class="en">63 files</span></dd>
+              </div>
+              <div>
+                <dt><span class="zh">其中模型</span><span class="en">of which models</span></dt>
+                <dd><b>16.84<small>MB</small></b><span class="zh">占 81%</span><span class="en">81%</span></dd>
+              </div>
+              <div>
+                <dt><span class="zh">首屏必下</span><span class="en">First playable frame</span></dt>
+                <dd><b>3.45<small>MB</small></b><span class="zh">JS gzip 285 KB</span><span class="en">285 KB gzipped JS</span></dd>
+              </div>
+              <div>
+                <dt><span class="zh">开发规模</span><span class="en">Development</span></dt>
+                <dd>
+                  <b>4<small><span class="zh">天</span><span class="en">days</span></small></b
+                  ><span class="zh">四天 · 49 笔提交 · 一人</span><span class="en">Four days · 49 commits · one person</span>
+                </dd>
+              </div>
+            </dl>
+            <figcaption class="card-meta">
+              <span class="zh">本机实测（游戏本体，不含本页素材）· 数字量自本机 <code>dist/</code>，2026-10-07。</span
+              ><span class="en">Measured locally (game build, excluding this page's media) · from the local <code>dist/</code> on 2026-10-07.</span>
             </figcaption>
           </figure>
 
-          <ul class="notes qr-notes">
-            <li>
-              <span class="zh"
-                ><b>最快的路就是它。</b>没有客服、没有工单中间层——反馈 Bug、讨论玩法、谈合作，
-                在微信里直接说，通常一天内回复。</span
-              ><span class="en"
-                ><b>The fastest way in.</b> No support desk, no ticket queue — bug reports, gameplay talk or
-                collaboration, said straight to the person who built it, usually answered within a day.</span
-              >
-            </li>
-            <li>
-              <span class="zh"
-                ><b>加上好友之前。</b>开发日志和 49 笔提交记录都公开在页脚的仓库里，
-                想先翻一遍再扫码，完全没问题。</span
-              ><span class="en"
-                ><b>Before you add him.</b> The dev log and all 49 commits are public in the repository linked in the
-                footer — scout through them first, then scan, that works just as well.</span
-              >
-            </li>
+          <ul class="stack" aria-label="技术栈 / Stack">
+            <li>Three.js r169</li>
+            <li>TypeScript</li>
+            <li>Vite</li>
+            <li>Blender</li>
+            <li>Tripo</li>
+            <li>Godot 4.6 → three.js</li>
           </ul>
+
+          <div class="cols">
+            <div class="col">
+              <p class="col-num">i</p>
+              <h4><span class="zh">为弱机而生</span><span class="en">Built for weak hardware</span></h4>
+              <ul class="notes">
+                <li>
+                  <span class="zh"
+                    >路面、地形、草皮、水面<b>不下载任何贴图文件</b>，质感全部在着色器里算——一张铺满屏幕的草片，每层就是一次全屏纹理采样，而集显恰好卡在这里。</span
+                  ><span class="en"
+                    >Road, terrain, grass and water download <b>no texture files at all</b>; their detail is computed in
+                    shaders, because a grass card filling the screen costs a full-screen fetch per layer.</span
+                  >
+                </li>
+                <li>
+                  <span class="zh"
+                    >16 座驿站落在 13 个模型位上：其中 7 个是代码生成的（屋檐、柱、基座、栏杆，每座 0.01 MB，零图片字节），6 个加载真模型——5 座碎片驿站由 Tripo 生成、自带贴图，第 6 个位置本身就是一棵榕树。</span
+                  ><span class="en"
+                    >The 16 stations stand on 13 model slots: 7 are generated in code at 0.01 MB each with zero image
+                    bytes, and 6 load real models — the 5 fragment stations come from Tripo and do carry their own
+                    textures, and the sixth slot is a banyan tree in its own right.</span
+                  >
+                </li>
+                <li>
+                  <span class="zh"
+                    >三档画质切内部分辨率 0.60× / 0.85× / 1.0×、阴影与植被距离；低档直接删草皮，把预算花在分辨率上。没有后处理——暗角是一个 DOM 覆盖层，GPU 成本为零。</span
+                  ><span class="en"
+                    >Three tiers cut internal resolution (0.60× / 0.85× / 1.0×), shadows and vegetation range; the low tier
+                    deletes grass and spends that budget on resolution. No post-processing.</span
+                  >
+                </li>
+              </ul>
+            </div>
+
+            <div class="col">
+              <p class="col-num">ii</p>
+              <h4><span class="zh">Tripo 用了在哪</span><span class="en">Where Tripo did the work</span></h4>
+              <ul class="notes">
+                <li>
+                  <span class="zh"
+                    >22 个 3D 资产里 14 个来自 Tripo：摩托车的 69 个零件、自行车的 19 个、滑板的 5 个，外加 5 座碎片驿站、松树、竹丛、灌木与两栋现代建筑。</span
+                  ><span class="en"
+                    >14 of 22 3D assets came out of Tripo: 69 motorcycle parts, 19 bicycle parts, 5 skateboard parts,
+                    plus 5 fragment stations, pines, bamboo, shrubs and two modern buildings.</span
+                  >
+                </li>
+                <li>
+                  <span class="zh"
+                    >两份车模导出时都是 <b>0 骨骼 0 动画</b>，摩托的骑手和车体还焊在同一批零件里。在 Blender 里按实测轴位重建两骨 IK、把踩踏循环烘成动画；three.js 侧再用协方差 Jacobi 特征分解从几何里量出车轴，修正导出时未对齐 three 轴向的偏差（自行车车头偏 10.67°、摩托偏 26.58°）。</span
+                  ><span class="en"
+                    >Both vehicles exported with <b>zero bones and zero animation</b>, the motorcycle's rider welded to
+                    the frame. Two-bone IK was rebuilt in Blender against measured axes; on the three.js side a covariance
+                    Jacobi eigendecomposition recovers the drive axis and corrects the export's axis mismatch (bicycle
+                    10.67°, motorcycle 26.58°).</span
+                  >
+                </li>
+                <li>
+                  <span class="zh"
+                    >自行车的曲柄轴、曲柄臂与两只踏板共 7 个零件是导出件里没有的，是在 Tripo 模型之上自己搭的传动机构。</span
+                  ><span class="en"
+                    >Seven bicycle parts — crank axle, crank arms, both pedals — are not in the export at all: the
+                    drivetrain was built on top of the Tripo model.</span
+                  >
+                </li>
+              </ul>
+            </div>
+
+            <div class="col">
+              <p class="col-num">iii</p>
+              <h4><span class="zh">怎么保证它没坏</span><span class="en">How it is kept honest</span></h4>
+              <ul class="notes">
+                <li>
+                  <span class="zh"
+                    >移植自 Godot 4.6 原型，本届比赛期间重做为 three.js r169 + TypeScript + Vite；玩法与数值 1:1 保留，双语文案在此基础上补到 415 条，表现层与工程结构重做。</span
+                  ><span class="en"
+                    >The original was Godot 4.6. This build is three.js r169 + TypeScript + Vite — a full port rebuilt
+                    during the competition: gameplay and numbers kept 1:1, the bilingual strings carried over and grown
+                    to 415, the presentation layer and project structure rebuilt.</span
+                  >
+                </li>
+                <li>
+                  <span class="zh"
+                    >几何不变量写成无头回归：<b>60 条 / 935 条断言</b>，钉住 961 个中线点、1228.8 m、4 处交叉、16 座驿站可达、经济系统总量、水位、双语键集合一致。它是上线的门。</span
+                  ><span class="en"
+                    >Geometric invariants live in a headless regression — <b>60 suites / 935 assertions</b> pinning the 961
+                    centreline points, 1228.8 m, 4 crossings, 16 reachable stations, economy totals, water level and
+                    bilingual key parity. It gates the deploy.</span
+                  >
+                </li>
+                <li>
+                  <span class="zh"
+                    >它抓到过真问题：一个漏掉的 <code>fmod</code> 把群山压成了一片高原，而当时所有按数量写的断言还是绿的。</span
+                  ><span class="en"
+                    >It has caught real bugs: a missing <code>fmod</code> flattened the mountains into a plateau while
+                    every count-based assertion stayed green.</span
+                  >
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================== 陆 · 联系开发者 ==================== -->
+      <!-- 排成一张明信片：游戏的终点就是一张明信片，这一页也用一张收尾 -->
+      <section id="contact" class="section section-contact">
+        <div class="wrap">
+          <header class="chapter chapter-slim">
+            <p class="chapter-rule" aria-hidden="true"><span>No. 06 — Write to the road</span><span>06 / 06</span></p>
+          </header>
+
+          <div class="postcard">
+            <div class="postcard-msg">
+              <p class="postcard-kicker" aria-hidden="true">Post card</p>
+              <h2 class="chapter-title">
+                <span class="zh">联系开发者</span><span class="en">Contact the developer</span>
+              </h2>
+              <p class="lede">
+                <span class="zh"
+                  >《188号礼物》是一个人做的：代码、模型、动画、音乐、双语文案，全部出自同一双手。<b>扫下面的码，加开发者本人的微信</b>——反馈 Bug、讨论玩法、谈合作，直接找到他，没有客服中间层。</span
+                ><span class="en"
+                  >Gift No.188 is made by one person — code, models, animation, music and both languages, all the same pair
+                  of hands. <b>Scan the code to add the developer on WeChat</b> — bug reports, gameplay talk or collaboration
+                  reach him directly, with no support desk in between.</span
+                >
+              </p>
+
+              <ul class="notes qr-notes">
+                <li>
+                  <span class="zh"
+                    ><b>最快的路就是它。</b>没有客服、没有工单中间层——反馈 Bug、讨论玩法、谈合作，在微信里直接说，通常一天内回复。</span
+                  ><span class="en"
+                    ><b>The fastest way in.</b> No support desk, no ticket queue — bug reports, gameplay talk or
+                    collaboration, said straight to the person who built it, usually answered within a day.</span
+                  >
+                </li>
+                <li>
+                  <span class="zh"
+                    ><b>加上好友之前。</b>开发日志和 49 笔提交记录都公开在页脚的仓库里，想先翻一遍再扫码，完全没问题。</span
+                  ><span class="en"
+                    ><b>Before you add him.</b> The dev log and all 49 commits are public in the repository linked in the
+                    footer — scout through them first, then scan, that works just as well.</span
+                  >
+                </li>
+              </ul>
+
+              <p class="address" aria-hidden="true">
+                <span><i><span class="zh">寄自</span><span class="en">From</span></i><span class="zh">第十八驿站</span><span class="en">The Eighteenth Station</span></span>
+                <span><i><span class="zh">致</span><span class="en">To</span></i><span class="zh">每一个走过这条路的人</span><span class="en">everyone who takes this road</span></span>
+              </p>
+            </div>
+
+            <div class="postcard-side">
+              <!-- 邮票：标题美术本身，齿孔边。邮戳斜盖在它和相片之间 -->
+              <div class="stamp" aria-hidden="true">
+                <span class="stamp-inner">
+                  <img src="media/hero.jpg" alt="" width="1920" height="1072" loading="lazy" />
+                  <span class="stamp-value">188</span>
+                </span>
+              </div>
+              <div class="postmark" aria-hidden="true">
+                <span class="postmark-ring"></span>
+                <span class="postmark-text">No.188</span>
+              </div>
+
+              <!--
+                二维码是竖长的微信原图（820×1212），头像、昵称、那句「扫二维码，添加我为好友」
+                都在图里——原样摆出来最像本人手机里长出来的样子，也最不容易被怀疑是转手的图。
+                宽度锁上限、高度 auto：竖图跟着卡片走，不会被栏宽抻成横幅。
+              -->
+              <figure class="qr-card">
+                <img
+                  src="media/wechat-qr.png"
+                  alt="开发者微信二维码：扫二维码，添加我为好友。WeChat QR code of the developer — scan to add him as a friend."
+                  width="820"
+                  height="1212"
+                  loading="lazy"
+                />
+                <figcaption>
+                  <span class="zh">微信 · 开发者本人的账号</span>
+                  <span class="en">WeChat · the developer himself</span>
+                </figcaption>
+              </figure>
+            </div>
+          </div>
         </div>
       </section>
     </main>
 
     <footer class="foot">
-      <p class="foot-links">
-        <a data-cfg="repoUrl" href="https://github.com/Jasper-Leung/188js"><span class="zh">代码仓库</span><span class="en">Repository</span></a>
-        <a data-cfg="devlogUrl" href="https://github.com/Jasper-Leung/188js/blob/main/promo/devlog.md"><span class="zh">开发日志</span><span class="en">Dev log</span></a>
-        <a data-cfg="commitsUrl" href="https://github.com/Jasper-Leung/188js/commits/main"><span class="zh">提交记录</span><span class="en">Commits</span></a>
-        <a
-          data-cfg="demoUrl"
-          href="https://jasper-leung.github.io/188js/?"
-          target="_blank"
-          rel="noopener"
-          ><span class="zh">在线 Demo</span><span class="en">Live demo</span></a
-        >
-        <a href="#contact"><span class="zh">联系开发者</span><span class="en">Contact the developer</span></a>
-      </p>
-      <p class="foot-note">
-        <span class="zh"
-          >《188号礼物》· 独立开发 · 运行时只依赖 three.js；模型与音频自制或 Tripo 产出，未使用需署名的第三方素材。</span
-        ><span class="en"
-          >Gift No.188 · independent · the only runtime dependency is three.js; models and audio are self-made or
-          Tripo-generated, no third-party assets requiring attribution.</span
-        >
-      </p>
+      <div class="wrap">
+        <div class="foot-top">
+          <p class="foot-line">
+            <span class="zh">那条路一直在。<br />去骑一圈吧。</span
+            ><span class="en">The road is still there.<br />Go ride a lap.</span>
+          </p>
+          <a
+            class="btn btn-primary btn-lg"
+            data-cfg="demoUrl"
+            href="https://jasper-leung.github.io/188js/?"
+            target="_blank"
+            rel="noopener"
+          >
+            <span class="zh">在线试玩</span><span class="en">Play online</span>
+            <span class="btn-arrow" aria-hidden="true"
+              ><svg class="i" viewBox="0 0 24 24"><path d="M5 12h13M13 6l6 6-6 6" /></svg
+            ></span>
+          </a>
+        </div>
+
+        <div class="foot-mid">
+          <nav class="foot-links" aria-label="外部链接 / Links">
+            <a data-cfg="repoUrl" href="https://github.com/Jasper-Leung/188js"><span class="zh">代码仓库</span><span class="en">Repository</span></a>
+            <a data-cfg="devlogUrl" href="https://github.com/Jasper-Leung/188js/blob/main/promo/devlog.md"><span class="zh">开发日志</span><span class="en">Dev log</span></a>
+            <a data-cfg="commitsUrl" href="https://github.com/Jasper-Leung/188js/commits/main"><span class="zh">提交记录</span><span class="en">Commits</span></a>
+            <a
+              data-cfg="demoUrl"
+              href="https://jasper-leung.github.io/188js/?"
+              target="_blank"
+              rel="noopener"
+              ><span class="zh">在线 Demo</span><span class="en">Live demo</span></a
+            >
+            <a href="#contact"><span class="zh">联系开发者</span><span class="en">Contact the developer</span></a>
+          </nav>
+          <a class="foot-top-link" href="#top"><span class="zh">回到顶部</span><span class="en">Back to top</span> ↑</a>
+        </div>
+
+        <p class="foot-note">
+          <span class="zh"
+            >《188号礼物》· 独立开发 · 运行时只依赖 three.js；模型与音频自制或 Tripo 产出，未使用需署名的第三方素材。</span
+          ><span class="en"
+            >Gift No.188 · independent · the only runtime dependency is three.js; models and audio are self-made or
+            Tripo-generated, no third-party assets requiring attribution.</span
+          >
+        </p>
+      </div>
+      <!-- 页脚最底下一整行的字标，被页面边缘裁掉一截——像一张拍到画框外的照片 -->
+      <p class="foot-word" aria-hidden="true">Gift <em>No.</em>188</p>
     </footer>
 
     <script src="landing.js" defer></script>

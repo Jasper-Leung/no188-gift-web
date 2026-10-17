@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <!-- 朱印：页面导航里那枚「188」印章的同款，做站点图标 -->
+  <rect x="4" y="4" width="56" height="56" rx="9" fill="#b4552f"/>
+  <rect x="9" y="9" width="46" height="46" rx="5" fill="none" stroke="#f4efe3" stroke-opacity=".55" stroke-width="2"/>
+  <text x="32" y="41.5" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="24" letter-spacing="-1" fill="#f4efe3">188</text>
+</svg>
