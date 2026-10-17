@@ -8,11 +8,13 @@
 
 ```
 index.html      介绍页（站点根路径）
-landing.css     介绍页样式
-landing.js      语言切换 + 复制按钮
+landing.css     介绍页样式（纸、墨、朱印三色 + 两条深色带：01 号录屏、页脚）
+landing.js      语言切换 + 复制按钮 + 导航状态 + 入场淡入（都是锦上添花，脚本不跑页面照样完整）
+favicon.svg     站点图标：导航里那枚「188」朱印
 media/          hero.jpg / poster.jpg / demo.mp4（录屏）+ 英配字幕 .srt / .ass
                 promo-morning.mp4（宣传氛围片）+ 封面帧 / 三张静帧
-fonts/ui.woff2  子集化字体，介绍页在用
+fonts/ui.woff2  子集化字体（霞鹜文楷），介绍页所有中文都用它
+fonts/latin/    三款只含拉丁字符的 OFL 字体 + 各自的许可证（见下「拉丁字体」）
 tools/          subset-font.mjs（只在改文案后需要跑，见下）
 submission/     只有一个跳转页，把旧地址引回根路径
 ```
@@ -66,6 +68,21 @@ GB2312 全集——那七千多字逐个单独子集化要好几分钟，而字�
 
 页面用到的、国标与符号补充都没覆盖的字目前只有一个：`個`(U+500B)，来自正文引的
 碑文「半個 188」。它由页面兜底那一步并进去，所以切字体时不会漏。
+
+## 拉丁字体
+
+`fonts/latin/` 里是三款 SIL OFL 1.1 授权的字体，取自 npm 上的 `@fontsource` 包（拉丁子集），
+许可证原文就放在旁边的 `OFL-*.txt`，随站点一起发布——OFL 允许自托管与再分发，条件是带上许可证：
+
+```
+instrument-serif(.woff2 / -italic)  21 / 22 KB  大标题、数字、章节旁注
+ibm-plex-mono.woff2                 15 KB       小号标注（章节页眉、场记条、编号）
+newsreader.woff2                    58 KB       只在英文版当正文；中文页不会下载
+```
+
+在 `landing.css` 里它们都排在字体栈**前面**，但 `unicode-range` 只认拉丁——中文字符会自己落回
+`ui.woff2`。Instrument Serif 故意不收破折号和中文常用的弯引号，免得中文里的「——」被换成一截西文细线。
+不从 Google Fonts 引：那个域名在大陆打不开，而且 CSP 只放行本站。
 
 ## 更新录屏
 
@@ -150,6 +167,18 @@ promo-style-c.jpg          风格候选 C · 两杯茶（同上，页面上标�
 `.github/workflows/pages.yml` 在 `main` 每次 push 后把站点文件交给 `actions/deploy-pages`。工作流刻意**不写死文件清单**——只排除仓库自身的东西，新增的资源目录不用改工作流就会自动上线。
 
 `.nojekyll` 用来阻止 Pages 把下划线开头的路径交给 Jekyll 处理。
+
+切字体的开发工具（`tools/`、`package*.json`、`fonts/charset.json`）同样在排除列表里，不上线。
+四个 action 钉在提交 SHA 上（行尾注释写着对应版本），升级时 SHA 与注释一起换。
+
+## 安全头
+
+Pages 不让自定义响应头，`index.html` 里用 `<meta http-equiv="Content-Security-Policy">` 把
+脚本、样式、图片、媒体、字体都收到只认本站（图片多放一个 `data:`，给 CSS 里的纸纹）。
+所以**页面里不能写内联 `<script>`、`<style>` 或 `style=""` 属性**——写了浏览器会直接拦下，
+控制台报 CSP 错误。要加样式就写进 `landing.css`，要加行为就写进 `landing.js`；
+JS 里用 `el.style.xxx = …` 赋值不受影响。将来真要引第三方资源（统计、外链字体），
+记得同步改这条策略。
 
 ## 体积
 
