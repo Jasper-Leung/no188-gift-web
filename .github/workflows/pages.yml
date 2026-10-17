@@ -26,31 +26,46 @@ jobs:
     steps:
       # 仓库根目录就是编译产物本身，没有构建步骤——源码在
       # 188js 仓库，产物由本地 `npm run build` 生成后提交到这里。
-      - uses: actions/checkout@v4
+      #
+      # 四个 action 都钉在**提交 SHA** 上，不用 `@v4` 这种标签：标签可以被挪走，
+      # 一旦上游仓库被攻破、标签指向恶意提交，这个手里攥着 pages:write 与
+      # id-token:write 的工作流会照单全收。升级时把 SHA 和行尾注释的版本号一起换。
+      #
+      # persist-credentials: false —— 后面没有任何一步要推送，不必把 GITHUB_TOKEN
+      # 留在 .git/config 里（下面打包时 .git 虽然被排除，少一份凭据总归更干净）。
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          persist-credentials: false
 
-      # 站点文件 = 仓库根目录里除版本库/工作流/文档之外的一切。
+      # 站点文件 = 仓库根目录里除版本库/工作流/文档/开发工具之外的一切。
       #
       # 这里刻意**不写死文件清单**。写死的版本漏过一次：产物里多出
       # `ui/titleart.jpg`（标题页主视觉），清单没跟着改，线上标题图
       # 直接 404 —— 而工作流照样绿灯。排除列表只列仓库自身的东西，
       # 新增的资源目录于是不需要改工作流就会自动上线。
+      #
+      # 切字体的开发工具（tools/、package*.json、fonts/charset.json）也是「仓库自身的
+      # 东西」，访客用不上：charset.json 里还记着本机源字体的绝对路径。一并排除。
       - name: 收集站点文件
         run: |
           mkdir -p _site
           tar --exclude='./.git' --exclude='./.github' \
               --exclude='./.gitattributes' --exclude='./.gitignore' \
               --exclude='./README.md' --exclude='./_site' \
+              --exclude='./tools' --exclude='./node_modules' \
+              --exclude='./package.json' --exclude='./package-lock.json' \
+              --exclude='./fonts/charset.json' \
               -cf - . | tar -xf - -C _site
 
       # enablement: 仓库还没开过 Pages 时由这一步替它开，省掉
       # Settings → Pages 里的一次手动点击。
-      - uses: actions/configure-pages@v5
+      - uses: actions/configure-pages@983d7736d9b0ae728b81ab479565c72886d7745b # v5.0.0
         with:
           enablement: true
 
-      - uses: actions/upload-pages-artifact@v3
+      - uses: actions/upload-pages-artifact@56afc609e74202658d3ffba0e8f6dda462b719fa # v3.0.1
         with:
           path: _site
 
       - id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@d6db90164ac5ed86f2b6aed7e0febac5b3c0c03e # v4.0.5
